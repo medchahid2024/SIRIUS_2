@@ -1,10 +1,10 @@
 pipeline {
 	agent any
-
-    stages {
-		triggers {
-			pollSCM('H/1 * * * *')
+triggers {
+		pollSCM('H/1 * * * *')
     }
+    stages {
+
 		stage('Clone') {
 			steps {
 				git url: 'https://github.com/medchahid2024/SIRIUS_2.git', branch: 'main'
