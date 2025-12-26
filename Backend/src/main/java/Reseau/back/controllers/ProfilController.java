@@ -1,6 +1,7 @@
-package Reseau.back.controllers.Profil;
+package Reseau.back.controllers;
 
 import Reseau.back.models.MyUpec.Profil;
+import Reseau.back.repositories.MyUpec.ProfilRepository;
 import Reseau.back.services.MyUpec.ProfilService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,11 +10,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/profil")  // ← Slash pour cohérence
+@RequestMapping("/MyUpec/profil")  // ← Slash pour cohérence
 public class ProfilController {
 
     @Autowired
     private ProfilService profilService;
+    private ProfilRepository profilRepository;
 
     @GetMapping("/{id}")
     public ResponseEntity<Profil> getProfil(@PathVariable Long id) {
@@ -25,7 +27,10 @@ public class ProfilController {
     public ResponseEntity<List<Profil>> findAllProfils() {
         return new ResponseEntity<>(profilService.findAllProfils(), HttpStatus.OK);
     }
-
+    @PostMapping
+    Profil profil(@RequestBody Profil profil){
+        return profilRepository.save(profil);
+    }
 
 
     @DeleteMapping("/{id}")

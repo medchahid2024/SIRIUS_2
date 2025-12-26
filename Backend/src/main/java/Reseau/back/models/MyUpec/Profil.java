@@ -29,8 +29,9 @@ public class Profil {
     @Column(name = "nationalite", length = 100)
     private String nationalite;
 
-    @Column(name = "centresinteret", columnDefinition = "TEXT")
+    @Column(name = "centresinteret", length = 100)
     private String centresInteret;
+
 
     @OneToOne
     @JoinColumn(name = "idutilisateur", referencedColumnName = "idutilisateur", unique = true)

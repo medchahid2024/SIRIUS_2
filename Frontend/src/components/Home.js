@@ -11,7 +11,7 @@ export default  function Home()
     },[]);
     const  loading=async ()=>{
 
-        const  result=await axios.get("http://localhost:8080/profil");
+        const  result=await axios.get("http://localhost:8080/MyUpec/profil/all");
         setUser(result.data);
     }
 
