@@ -1,13 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.jpeg";
+import  "../styles/Home.css";
 
 export default function Navbar() {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-danger">
             <div className="container-fluid">
                 <Link to="/" className="navbar-brand">
-                    <img src={logo} width={100} height={60} alt="logo" />
+                    <img src={logo} width={100} height={60} alt="logo"/>
                 </Link>
 
                 <button
@@ -22,13 +23,22 @@ export default function Navbar() {
                     <span className="navbar-toggler-icon"></span>
                 </button>
 
+
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <form className="d-flex ms-auto" role="search">
-                        <input className="form-control me-2" type="search" placeholder="Rechercher..." />
+                        <input className="form-control me-2" type="search" placeholder="Rechercher..."/>
                         <button className="btn btn-outline-light" type="submit">Rechercher</button>
                     </form>
-                         <Link to="/Profil" className="nav-link">
-                    <span className="navbar-text text-white ms-3" >Chahid Mohammed</span></Link>
+
+                </div>
+                <div className="navbar-right">
+                    <a className="navbar-brand" href="/">messagerie</a>
+                    <a className="navbar-brand" href="/">notification</a>
+                    <a className="navbar-brand" href="/">about</a>
+
+                    <Link to="/Profil" className="user-name">
+                        Chahid Mohammed
+                    </Link>
                 </div>
             </div>
         </nav>

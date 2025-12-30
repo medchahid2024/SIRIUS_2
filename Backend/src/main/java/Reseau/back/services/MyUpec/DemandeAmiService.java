@@ -17,4 +17,18 @@ public class DemandeAmiService {
     public SexeCountsView countSexeAmisAcceptes(Long idUser) {
         return demandeAmiRepository.countSexeAmisAcceptes(idUser);
     }
+    public record SexePctDto(long pctMasculin, long pctFeminin, long pctInconnu) {}
+
+    public SexePctDto  countPourcentageSexeAmisDecider(Long idUser) {
+        SexeCountsView v = demandeAmiRepository.countSexeAmisAcceptes(idUser);
+        long nbM = (v == null || v.getNbMasculin() == null) ? 0 : v.getNbMasculin();
+        long nbF = (v == null || v.getNbFeminin()  == null) ? 0 : v.getNbFeminin();
+        long nbI = (v == null || v.getNbInconnu()  == null) ? 0 : v.getNbInconnu();
+       Long total=nbM+nbF+nbI;
+        Long m = (v.getNbMasculin()*100)/total;
+        Long f = (v.getNbFeminin()*100)/total;
+        Long inc = (v.getNbInconnu()*100)/total;
+        return new SexePctDto(m,f,inc);
+
+    }
 }

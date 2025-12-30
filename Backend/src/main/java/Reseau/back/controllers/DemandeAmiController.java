@@ -18,4 +18,8 @@ public class DemandeAmiController {
     public ResponseEntity<SexeCountsView> getStatsAmis(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.countSexeAmisAcceptes(id));
     }
+    @GetMapping("/statistiques/pourcentage/{id}")
+    public ResponseEntity<DemandeAmiService.SexePctDto> getPourcentage(@PathVariable Long id) {
+        return ResponseEntity.ok(service.countPourcentageSexeAmisDecider(id));
+    }
 }
