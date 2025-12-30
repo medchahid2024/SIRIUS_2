@@ -1,9 +1,12 @@
 package Reseau.back.services.MyUpec;
 
 import Reseau.back.repositories.MyUpec.DemandeAmiRepository;
+import Reseau.back.repositories.MyUpec.NationaliteCountView;
 import Reseau.back.repositories.MyUpec.SexeCountsView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class DemandeAmiService {
@@ -31,4 +34,9 @@ public class DemandeAmiService {
         return new SexePctDto(m,f,inc);
 
     }
+
+    public List<NationaliteCountView> countNationaliteAmisAcceptes(Long idUser) {
+        return demandeAmiRepository.countAmisParNationalite(idUser);
+    }
+
 }
