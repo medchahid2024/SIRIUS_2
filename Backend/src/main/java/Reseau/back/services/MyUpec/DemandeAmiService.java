@@ -1,5 +1,6 @@
 package Reseau.back.services.MyUpec;
 
+import Reseau.back.Counters.AffichageAmis;
 import Reseau.back.repositories.MyUpec.DemandeAmiRepository;
 import Reseau.back.Counters.NationaliteCountView;
 import Reseau.back.Counters.SexeCountsView;
@@ -15,7 +16,10 @@ public class DemandeAmiService {
     private DemandeAmiRepository demandeAmiRepository;
 
 
+public List<AffichageAmis> affichageAmis(Long idUser) {
+    return demandeAmiRepository.afficheMesAmis(idUser);
 
+}
 
     public SexeCountsView countSexeAmisAcceptes(Long idUser) {
         return demandeAmiRepository.countSexeAmisAcceptes(idUser);

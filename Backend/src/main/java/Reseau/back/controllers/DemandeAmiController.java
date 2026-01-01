@@ -1,7 +1,9 @@
 package Reseau.back.controllers;
 
+import Reseau.back.Counters.AffichageAmis;
 import Reseau.back.Counters.NationaliteCountView;
 import Reseau.back.Counters.SexeCountsView;
+import Reseau.back.models.MyUpec.Utilisateur;
 import Reseau.back.services.MyUpec.DemandeAmiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,4 +31,9 @@ public class DemandeAmiController {
     public ResponseEntity<List<NationaliteCountView>> getAmisParNationalite(@PathVariable Long id) {
         return ResponseEntity.ok(service.countNationaliteAmisAcceptes(id));
     }
+    @GetMapping("/mesAmis/{id}")
+    public ResponseEntity<List<AffichageAmis>> getMyFriends(@PathVariable Long id) {
+        return ResponseEntity.ok(service.affichageAmis(id));
+    }
+
 }

@@ -1,5 +1,6 @@
 package Reseau.back.repositories.MyUpec;
 
+import Reseau.back.Counters.AffichageAmis;
 import Reseau.back.Counters.NationaliteCountView;
 import Reseau.back.Counters.SexeCountsView;
 import Reseau.back.models.MyUpec.DemandeAmi;
@@ -9,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+
 
 @Repository
 public interface DemandeAmiRepository extends JpaRepository<DemandeAmi, Long> {
@@ -51,6 +53,24 @@ SELECT idemetteur AS u, idrecepteur AS ami FROM demandeami
     """, nativeQuery = true)
     List<NationaliteCountView> countAmisParNationalite(@Param("idUser") Long idUser);
 
-
+@Query (value= """
+SELECT
+  u.idutilisateur AS idutilisateur,
+  u.nom AS nom,
+  u.prenom AS prenom,
+  p.photoprofil AS photo
+FROM demandeami d
+JOIN utilisateur u
+  ON u.idutilisateur = CASE
+    WHEN d.idemetteur = :idUser THEN d.idrecepteur
+    ELSE d.idemetteur
+  END
+LEFT JOIN profil p
+  ON p.idutilisateur = u.idutilisateur
+WHERE d.statutdemande = 'ACCEPTEE'
+  AND :idUser IN (d.idemetteur, d.idrecepteur)
+ORDER BY u.nom, u.prenom;
+""", nativeQuery = true)
+    List<AffichageAmis> afficheMesAmis(@Param("idUser") Long idUser);
 
 }
