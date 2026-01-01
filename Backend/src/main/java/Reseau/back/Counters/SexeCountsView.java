@@ -1,4 +1,4 @@
-package Reseau.back.repositories.MyUpec;
+package Reseau.back.Counters;
 
 public interface SexeCountsView {
     Long getNbMasculin();

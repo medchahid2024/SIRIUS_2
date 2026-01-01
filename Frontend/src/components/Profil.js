@@ -1,9 +1,14 @@
 import "../styles/Profil.css";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import logo from "../assets/logo.jpeg";
 
 
 export default function Profil() {
+    const [user, setUser] = useState(null);
+    useEffect(() => {
+        const u = localStorage.getItem("user");
+        if (u) setUser(JSON.parse(u));
+    }, []);
     return (
 
         <div className="profil-page">
@@ -14,7 +19,7 @@ export default function Profil() {
 
             <div className="profil-card">
 
-                <h2>Chahid Mohammed</h2>
+                <h2>{user ? `${user.nom} ${user.prenom}` : "Profil"} </h2>
                 <p className="profil-title">Voir les statistiques</p>
                 <p className="profil-location">France</p>
             </div>

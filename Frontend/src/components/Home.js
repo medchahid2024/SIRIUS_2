@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react';
 import axios from "axios";
-import {GET_Profils,LOCAL_HOST_Profil,UPDATE_Profil} from "../constants/back";
 
 
 export default  function Home()
@@ -31,7 +30,7 @@ export default  function Home()
                 user.map((user, index) =>
                     <tr>
                         <td>{user.bio}</td>
-                        <td>{user.centresInteret}</td>
+                        <td>{user.ville}</td>
                     </tr>
                 )
             }

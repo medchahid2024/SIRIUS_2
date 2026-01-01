@@ -1,13 +1,19 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.jpeg";
 import  "../styles/Home.css";
 
 export default function Navbar() {
+    const [user, setUser] = useState(null);
+    useEffect(() => {
+        const u = localStorage.getItem("user");
+        if (u) setUser(JSON.parse(u));
+    }, []);
+
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-danger">
             <div className="container-fluid">
-                <Link to="/" className="navbar-brand">
+                <Link to="/Home" className="navbar-brand">
                     <img src={logo} width={100} height={60} alt="logo"/>
                 </Link>
 
@@ -32,13 +38,12 @@ export default function Navbar() {
 
                 </div>
                 <div className="navbar-right">
-                    <a className="navbar-brand" href="/">messagerie</a>
-                    <a className="navbar-brand" href="/">notification</a>
-                    <a className="navbar-brand" href="/">about</a>
+                    <a className="navbar-brand" href="/Home">messagerie</a>
+                    <a className="navbar-brand" href="/Home">notification</a>
+                    <a className="navbar-brand" href="/Home">about</a>
 
                     <Link to="/Profil" className="user-name">
-                        Chahid Mohammed
-                    </Link>
+                        {user ? `${user.nom} ${user.prenom}` : "Profil"}                  </Link>
                 </div>
             </div>
         </nav>

@@ -1,8 +1,8 @@
 package Reseau.back.services.MyUpec;
 
 import Reseau.back.repositories.MyUpec.DemandeAmiRepository;
-import Reseau.back.repositories.MyUpec.NationaliteCountView;
-import Reseau.back.repositories.MyUpec.SexeCountsView;
+import Reseau.back.Counters.NationaliteCountView;
+import Reseau.back.Counters.SexeCountsView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

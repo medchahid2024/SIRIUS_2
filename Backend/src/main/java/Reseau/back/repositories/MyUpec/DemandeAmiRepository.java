@@ -1,5 +1,7 @@
 package Reseau.back.repositories.MyUpec;
 
+import Reseau.back.Counters.NationaliteCountView;
+import Reseau.back.Counters.SexeCountsView;
 import Reseau.back.models.MyUpec.DemandeAmi;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
