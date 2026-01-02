@@ -1,14 +1,31 @@
 import "../styles/Profil.css";
 import React, {useEffect, useState} from "react";
-import logo from "../assets/logo.jpeg";
 
 
 export default function Profil() {
     const [user, setUser] = useState(null);
-    useEffect(() => {
-        const u = localStorage.getItem("user");
+    const [friends, setFriends] = useState([]);
+    const [afficheAmis, setafficheAmis] = useState(false);
+
+
+
+
+    useEffect(() => {const u = localStorage.getItem("user");
         if (u) setUser(JSON.parse(u));
     }, []);
+
+
+
+    useEffect(() => {
+        if (!user?.idUtilisateur) return;
+
+        fetch(`http://localhost:8080/MyUpec/ami/mesAmis/${user.idUtilisateur}`)
+            .then((r) => r.json())
+            .then((data) => setFriends(Array.isArray(data) ? data : []))
+            .catch(console.error);
+    }, [user?.idUtilisateur]);
+
+
     return (
 
         <div className="profil-page">
@@ -20,7 +37,27 @@ export default function Profil() {
             <div className="profil-card">
 
                 <h2>{user ? `${user.nom} ${user.prenom}` : "Profil"} </h2>
+
                 <p className="profil-title">Voir les statistiques</p>
+                <p
+                    className="profil-title"
+                    onClick={() => setafficheAmis(!afficheAmis)}
+                    style={{ cursor: "pointer" }}
+                >
+                    Mes amis ({friends.length})
+                </p>
+
+                {afficheAmis && (
+                    <div className="friends-list">
+                        {friends.map((f) => (
+                            <div className="friend-item" key={f.idUtilisateur}>
+                                <div>{f.nom} {f.prenom}</div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+
                 <p className="profil-location">France</p>
             </div>
 
@@ -30,15 +67,14 @@ export default function Profil() {
                     <div className="card">
                         <h3>À propos</h3>
                         <p>
-                            Étudiant en informatique, passionné par le développement web
-                            et les technologies modernes.
+
                         </p>
                     </div>
                 </aside>
 
                 <main className="profil-center">
                     <div className="card">
-                        <h3>Activité</h3>
+                        <h3>Mes Publications</h3>
                         <div className="post">Publication 1</div>
                         <div className="post">Publication 2</div>
                     </div>
@@ -46,11 +82,9 @@ export default function Profil() {
 
                 <aside className="profil-right">
                     <div className="card">
-                        <h3>Compétences</h3>
+                        <h3></h3>
                         <ul>
-                            <li>React</li>
-                            <li>CSS</li>
-                            <li>JavaScript</li>
+
                         </ul>
                     </div>
                 </aside>
