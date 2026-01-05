@@ -1,10 +1,10 @@
 import React from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
-import App from "./App";
 import Navbar from "./Navbar";
 import Profil from "./Profil";
 import Authentification from "./Authentification";
 import Home from "./Home";
+import Statistiques from "./Statistiques";
 
 export default function Router() {
     return (
@@ -16,7 +16,8 @@ export default function Router() {
  <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/Home" element={<Home />} />
    <Route path="/Profil" element={<Profil />} />
-    <Route path="/app" element={<App />} />
+
+      <Route path="/Statistiques/:id" element={<Statistiques/>}/>
   </Routes>
                             </>
                            }

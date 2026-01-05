@@ -1,5 +1,6 @@
 import "../styles/Profil.css";
 import React, {useEffect, useState} from "react";
+import {Link} from "react-router-dom";
 
 
 export default function Profil() {
@@ -37,8 +38,12 @@ export default function Profil() {
             <div className="profil-card">
 
                 <h2>{user ? `${user.nom} ${user.prenom}` : "Profil"} </h2>
+                <Link to={`/Statistiques/${user?.idUtilisateur }`}>
+                    <p className="profil-title">Voir les statistiques</p>
+                </Link>
 
-                <p className="profil-title">Voir les statistiques</p>
+
+
                 <p
                     className="profil-title"
                     onClick={() => setafficheAmis(!afficheAmis)}
@@ -46,6 +51,7 @@ export default function Profil() {
                 >
                     Mes amis ({friends.length})
                 </p>
+
 
                 {afficheAmis && (
                     <div className="friends-list">
