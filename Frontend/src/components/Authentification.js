@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
+import  "../styles/Authentification.css";
+import logo from "../assets/logo.jpeg";
 
 export default function Authentification() {
     const [email, setEmail] = useState("");
@@ -33,21 +35,30 @@ export default function Authentification() {
     };
 
     return (
-        <form onSubmit={submit}>
+        <div className="authentification">
+            <div className="auth-box">
+
+                    <img src={logo} className="episen" width={170} height={100} alt="logo"/>
+                <h2>Se connecter </h2>
+        <form onSubmit={submit} className="form">
             <input
                 type="text"
                 placeholder="Entrez votre email"
+                className="input-group"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
             />
             <input
                 type="password"
+                className="input-group"
                 placeholder="Entrez votre mot de passe"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
             />
             <button type="submit">Login</button>
-            {error && <div style={{ color: "blue" }}>{error}</div>}
+            {error && <div style={{ color: "black" }}>{error}</div>}
         </form>
+        </div>
+        </div>
     );
 }
