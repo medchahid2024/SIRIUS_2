@@ -2,7 +2,7 @@ package Reseau.back.models.MyUpec;
 
 import jakarta.persistence.*;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 import java.time.Instant;
 
 

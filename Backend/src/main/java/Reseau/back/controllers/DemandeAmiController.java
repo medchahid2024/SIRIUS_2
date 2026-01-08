@@ -1,6 +1,7 @@
 package Reseau.back.controllers;
 
 import Reseau.back.Counters.AffichageAmis;
+import Reseau.back.Counters.AfficheBestAmis;
 import Reseau.back.Counters.NationaliteCountView;
 import Reseau.back.Counters.SexeCountsView;
 import Reseau.back.models.MyUpec.Utilisateur;
@@ -34,6 +35,10 @@ public class DemandeAmiController {
     @GetMapping("/mesAmis/{id}")
     public ResponseEntity<List<AffichageAmis>> getMyFriends(@PathVariable Long id) {
         return ResponseEntity.ok(service.affichageAmis(id));
+    }
+    @GetMapping("/mesAmis/Meilleures/{id}")
+    public ResponseEntity<List<AfficheBestAmis>> getMyBestFriends(@PathVariable Long id) {
+        return ResponseEntity.ok(service.AffichageMeilleureAmis(id));
     }
 
 }

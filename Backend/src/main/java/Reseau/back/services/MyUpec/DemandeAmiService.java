@@ -1,12 +1,14 @@
 package Reseau.back.services.MyUpec;
 
 import Reseau.back.Counters.AffichageAmis;
+import Reseau.back.Counters.AfficheBestAmis;
 import Reseau.back.repositories.MyUpec.DemandeAmiRepository;
 import Reseau.back.Counters.NationaliteCountView;
 import Reseau.back.Counters.SexeCountsView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Service
@@ -24,6 +26,9 @@ public List<AffichageAmis> affichageAmis(Long idUser) {
     public SexeCountsView countSexeAmisAcceptes(Long idUser) {
         return demandeAmiRepository.countSexeAmisAcceptes(idUser);
     }
+    public List<AfficheBestAmis> AffichageMeilleureAmis(Long idUser) {
+    return demandeAmiRepository.AffichageMeilleureAmis(idUser);
+    }
     public record SexePctDto(long pctMasculin, long pctFeminin, long pctInconnu) {}
 
     public SexePctDto  countPourcentageSexeAmisDecider(Long idUser) {
@@ -38,6 +43,9 @@ public List<AffichageAmis> affichageAmis(Long idUser) {
         return new SexePctDto(m,f,inc);
 
     }
+
+
+
 
     public List<NationaliteCountView> countNationaliteAmisAcceptes(Long idUser) {
         return demandeAmiRepository.countAmisParNationalite(idUser);

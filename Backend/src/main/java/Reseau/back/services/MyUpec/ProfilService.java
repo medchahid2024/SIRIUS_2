@@ -12,7 +12,10 @@ public class ProfilService {
 
     @Autowired
     private ProfilRepository profilRepository;
-
+    public Profil getMonProfil(Long myId) {
+        return profilRepository.findByUtilisateur_IdUtilisateur(myId)
+                .orElseThrow(() -> new RuntimeException("Profil introuvable de idUtilisateur=" + myId));
+    }
     public Optional<Profil> getProfilById(Long id) {
         return profilRepository.findProfilById(id) ;
     }

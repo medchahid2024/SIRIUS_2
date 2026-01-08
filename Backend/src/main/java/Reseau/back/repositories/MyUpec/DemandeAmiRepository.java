@@ -3,6 +3,7 @@ package Reseau.back.repositories.MyUpec;
 import Reseau.back.Counters.AffichageAmis;
 import Reseau.back.Counters.NationaliteCountView;
 import Reseau.back.Counters.SexeCountsView;
+import Reseau.back.Counters.AfficheBestAmis;
 import Reseau.back.models.MyUpec.DemandeAmi;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -72,5 +73,35 @@ WHERE d.statutdemande = 'ACCEPTEE'
 ORDER BY u.nom, u.prenom;
 """, nativeQuery = true)
     List<AffichageAmis> afficheMesAmis(@Param("idUser") Long idUser);
+
+
+
+@Query (value = """
+WITH mes_amis AS (
+  SELECT DISTINCT
+    CASE
+      WHEN da.idemetteur = :myId THEN da.idrecepteur
+      ELSE da.idemetteur
+    END AS ami_id
+  FROM demandeami da
+  WHERE (da.idemetteur = :myId OR da.idrecepteur = :myId)
+    AND da.statutdemande = 'ACCEPTEE'
+)
+SELECT
+   ma.ami_id        AS "amiId",
+    pr.etablissement AS "etablissement",
+    pr.nationalite   AS "nationalite",
+    COUNT(*)         AS "nb_jaime_sur_mes_publications"
+FROM mes_amis ma
+JOIN profil pr       ON pr.idutilisateur = ma.ami_id
+JOIN interaction i   ON i.idutilisateur = ma.ami_id
+JOIN publication p   ON p.idpublication = i.idpublication
+WHERE p.idutilisateur = :myId
+  AND i.typeinteraction = 'LIKE'
+GROUP BY ma.ami_id, pr.nationalite, pr.etablissement
+ORDER BY nb_jaime_sur_mes_publications DESC;
+
+""",nativeQuery = true)
+List<AfficheBestAmis> AffichageMeilleureAmis(@Param("myId") Long idUser);
 
 }
