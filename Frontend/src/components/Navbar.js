@@ -39,6 +39,7 @@ export default function Navbar() {
                 </div>
                 <div className="navbar-right">
                     <a className="navbar-brand" href="/Home">messagerie</a>
+                    <a className="navbar-brand" href="/Publication">publication</a>
                     <a className="navbar-brand" href="/Home">notification</a>
                     <a className="navbar-brand" href="/Home">about</a>
 
