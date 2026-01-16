@@ -33,6 +33,7 @@ public class Profil {
     private String centresInteret;
 
 
+
     @OneToOne
     @JoinColumn(name = "idutilisateur", referencedColumnName = "idutilisateur", unique = true)
     private Utilisateur utilisateur;

@@ -31,6 +31,8 @@ public class Publication {
     @Column(name = "visibilite", length = 20, nullable = false)
     private String visibilite;
 
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idutilisateur", referencedColumnName = "idutilisateur", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})

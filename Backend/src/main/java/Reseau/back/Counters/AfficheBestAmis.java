@@ -1,7 +1,6 @@
 package Reseau.back.Counters;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 
 public interface AfficheBestAmis {
     Long getAmiId();

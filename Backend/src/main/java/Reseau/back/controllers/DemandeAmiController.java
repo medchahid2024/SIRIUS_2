@@ -26,6 +26,8 @@ public class DemandeAmiController {
     }
     @GetMapping("/statistiques/pourcentage/{id}")
     public ResponseEntity<DemandeAmiService.SexePctDto> getPourcentage(@PathVariable Long id) {
+        System.out.println("pourcentage du sexe des amis de l'utilisateur "+id);
+
         return ResponseEntity.ok(service.countPourcentageSexeAmisDecider(id));
     }
     @GetMapping("/statistiques/nationalite/{id}")
@@ -38,6 +40,7 @@ public class DemandeAmiController {
     }
     @GetMapping("/mesAmis/Meilleures/{id}")
     public ResponseEntity<List<AfficheBestAmis>> getMyBestFriends(@PathVariable Long id) {
+
         return ResponseEntity.ok(service.AffichageMeilleureAmis(id));
     }
 
