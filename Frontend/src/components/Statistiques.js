@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import SexePieChart from "../Graphes/SexePieChart";
 import NationalitePieChart from "../Graphes/NationalitePieChart";
 import MeilleursAmisBarChart from "../Graphes/MeilleursAmisBarChart";
-import {getStatsSexe, getStatsNationalite, getMeilleursAmis,} from "../API/statistiquesApi";
+import {getStatsSexe, getStatsNationalite, getMeilleursAmis,} from "../API/api";
 import "../styles/StyleGraph.css";
 
 
