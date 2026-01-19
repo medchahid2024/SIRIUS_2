@@ -88,7 +88,6 @@ export default function Profil() {
 
                 <aside className="profil-right">
                     <div className="card">
-                        <h3></h3>
                         <ul>
 
                         </ul>
