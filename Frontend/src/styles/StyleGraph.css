@@ -1,0 +1,39 @@
+.row {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: stretch;
+}
+
+
+.barchart {
+    flex: 0 0 70%;
+    max-width: 70%;
+    background: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+
+.nationalite,
+.sexe {
+    flex: 0 0 40%;
+    max-width: 40%;
+    background: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+
+.nationalite {
+    margin-bottom: 20px;
+}
+
+
+.row h3 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
