@@ -32,6 +32,7 @@ pipeline {
 
         stage('Finish') {
 			steps {
+
 				echo 'Build finished!'
             }
         }
