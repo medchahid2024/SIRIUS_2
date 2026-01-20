@@ -5,7 +5,7 @@ pipeline {
 
 		stage('Clone') {
 			steps {
-				git url: 'https://github.com/medchahid2024/SIRIUS_2.git', branch: 'TestJenkins'
+				git url: 'https://github.com/medchahid2024/SIRIUS_2.git', branch: 'main'
             }
         }
 
