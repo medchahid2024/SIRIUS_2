@@ -12,7 +12,7 @@ pipeline {
         stage('Build Backend (Spring Boot)') {
 
 			steps {
-				dir('proto-back') {
+				dir('Backend') {
 					echo 'Building Spring Boot backend...'
 
                     sh 'mvn clean package -DskipTests'
@@ -22,7 +22,7 @@ pipeline {
 
         stage('Build Frontend (JavaScript)') {
 			steps {
-				dir('proto-front') {
+				dir('Frontend') {
 					echo 'Building frontend JavaScript...'
                     sh 'npm install'
                     sh 'npm run build'
