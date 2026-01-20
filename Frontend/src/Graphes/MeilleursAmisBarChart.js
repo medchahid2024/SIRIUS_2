@@ -4,7 +4,7 @@ import {ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid
 const randomCouleur = () => `#${Math.random().toString(16).slice(2, 8).padEnd(6, "0")}`;
 export default function MeilleursAmisBarChart({ data }) {
     return (
-        <div className="barchart" style={{ height: 100 }}>
+        <div className="barchart" style={{ height: 200 }}>
             <h3>Meilleurs amis </h3>
             <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data} layout="vertical" margin={{ left: 10, right: 30 }}>

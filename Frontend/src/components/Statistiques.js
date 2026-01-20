@@ -27,7 +27,7 @@ export default function Statistiques() {
             ]);
                 setNatData((natRes ?? []).map((x) => ({ name: x.nationalite, value: x.nb })));
             setScoreData(
-                (scoreRes ?? []).map((x) => ({ name: `Ami ${x.amiId}`,
+                (scoreRes ?? []).map((x) => ({ name: `Ami ${x.id}`,
                     value: x.score ,
                 }))
             );
