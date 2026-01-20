@@ -5,11 +5,12 @@ pipeline {
 
 		stage('Clone') {
 			steps {
-				git url: 'https://github.com/medchahid2024/SIRIUS_2.git', branch: 'main'
+				git url: 'https://github.com/medchahid2024/SIRIUS_2.git', branch: 'TestJenkins'
             }
         }
 
         stage('Build Backend (Spring Boot)') {
+
 			steps {
 				dir('proto-back') {
 					echo 'Building Spring Boot backend...'
