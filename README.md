@@ -11,3 +11,4 @@ WI5  meilleurs amis                              |  Algorithme| OK     |L'endpoi
 WI6  Dashboard stats                             |  GUI       | OK     |Je clique sur "Statistiques" et je vois plusieurs tableaux de bord. Les données viennent des APIs /stats/sexe et /amis/meilleurs
 
 test
+test 1
