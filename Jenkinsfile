@@ -14,6 +14,7 @@ pipeline {
 			steps {
 				dir('proto-back') {
 					echo 'Building Spring Boot backend...'
+
                     sh 'mvn clean package -DskipTests'
                 }
             }
