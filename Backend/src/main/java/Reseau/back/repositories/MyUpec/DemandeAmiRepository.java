@@ -99,7 +99,7 @@ JOIN publication p   ON p.idpublication = i.idpublication
 WHERE p.idutilisateur = :myId
   AND i.typeinteraction = 'LIKE'
 GROUP BY ma.ami_id, pr.nationalite, pr.etablissement
-ORDER BY nb_jaime_sur_mes_publications DESC;
+ORDER BY nb_jaime_sur_mes_publications DESC LIMIT 10;
 
 """,nativeQuery = true)
 List<AfficheBestAmis> AffichageMeilleureAmis(@Param("myId") Long idUser);
