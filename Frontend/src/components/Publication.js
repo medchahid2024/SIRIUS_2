@@ -1,89 +1,61 @@
 import React, { useEffect, useState } from "react";
 
 export default function Publication() {
-  const [items, setItems] = useState([]);
-  const [offset, setOffset] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [publications, setPublications] = useState([]);
   const [error, setError] = useState(null);
 
-  const limit = 10;
-
-  const load = async (reset = false) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const u = localStorage.getItem("user");
-      if (!u) throw new Error("Aucun utilisateur connecté (localStorage user vide).");
-
-      const user = JSON.parse(u);
-      const userId = user.idUtilisateur ?? user.idutilisateur;
-      if (!userId) throw new Error("id utilisateur introuvable dans localStorage.");
-
-      const currentOffset = reset ? 0 : offset;
-
-      const res = await fetch(`http://localhost:8080/api/feed/${userId}?offset=${currentOffset}&limit=${limit}`);
-      if (!res.ok) throw new Error("Erreur API: " + res.status);
-
-      const data = await res.json();
-
-      if (reset) {
-        setItems(data);
-        setOffset(limit);
-      } else {
-        setItems((prev) => [...prev, ...data]);
-        setOffset((prev) => prev + limit);
-      }
-
-      if (data.length < limit) setHasMore(false);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    load(true);
+    // Récupérer l'utilisateur connecté depuis localStorage
+    const u = localStorage.getItem("user");
+    if (!u) {
+      setError("Aucun utilisateur connecté (localStorage user vide).");
+      return;
+    }
+
+    const user = JSON.parse(u);
+
+    // ✅ IMPORTANT : adapte le champ si besoin (idUtilisateur vs idutilisateur)
+    const userId = user.idUtilisateur ?? user.idutilisateur;
+
+    if (!userId) {
+      setError("Impossible de trouver l'id utilisateur dans localStorage (user.idUtilisateur / user.idutilisateur).");
+      return;
+    }
+
+    fetch(`http://localhost:8080/MyUpec/publication/interacted/${userId}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Erreur API: " + res.status);
+          return res.json();
+        })
+        .then((data) => setPublications(data))
+        .catch((e) => setError(e.message));
   }, []);
 
   return (
-    <div className="container mt-4">
-      <h2>Recommandations</h2>
+      <div className="container mt-4">
+        <h1>Mes publications (interactions)</h1>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+        {error && <div className="alert alert-danger">{error}</div>}
 
-      {items.map((p) => (
-        <div className="card mb-3" key={p.idPublication}>
-          <div className="card-body">
-            <div className="d-flex justify-content-between">
-              <div>
-                <h5 className="card-title mb-1">{p.contenuTexte}</h5>
-                <small className="text-muted">Tag: {p.typePublication}</small>
-              </div>
-              <div className="text-end">
-                <small className="text-muted">Score</small>
-                <div style={{ fontWeight: "bold" }}>{Number(p.score).toFixed(4)}</div>
+        {!error && publications.length === 0 && (
+            <div className="alert alert-info">Aucune publication avec interaction.</div>
+        )}
+
+        {publications.map((pub) => (
+            <div key={pub.idPublication} className="card mb-3">
+              <div className="card-body">
+                <h5 className="card-title">{pub.contenuTexte}</h5>
+
+                <h6 className="card-subtitle mb-2 text-muted">
+                  {pub.auteur?.prenom} {pub.auteur?.nom} · {pub.typePublication}
+                </h6>
+
+                <small className="text-muted">
+                  {pub.dateCreation ? new Date(pub.dateCreation).toLocaleString() : ""}
+                </small>
               </div>
             </div>
-          </div>
-        </div>
-      ))}
-
-      {!loading && items.length === 0 && !error && (
-        <div className="alert alert-info">Aucune recommandation.</div>
-      )}
-
-      {hasMore && (
-        <button
-          className="btn btn-outline-primary"
-          onClick={() => load(false)}
-          disabled={loading}
-        >
-          {loading ? "Chargement..." : "Charger plus"}
-        </button>
-      )}
-    </div>
+        ))}
+      </div>
   );
 }
