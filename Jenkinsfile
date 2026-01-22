@@ -52,5 +52,38 @@ pipeline {
         """
       }
     }
+  stage('Run (restart services)') {
+    steps {
+      sh """
+        echo "=== BACKEND: stopper old + start new ==="
+        sshpass -p ${SSH_PASSWORD} ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
+          set -e
+          cd ${BACKEND_DEPLOY_PATH}
+
+          # Stop  backend en cours
+          pkill -f "java -jar ${BACKEND_JAR}" || true
+
+          # Start backend in background
+          nohup java -jar ${BACKEND_JAR} --spring.profiles.active=vm > backend.log 2>&1 &
+        '
+
+        echo "=== FRONTEND: stop old + start new ==="
+        sshpass -p ${SSH_PASSWORD} ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
+          set -e
+          cd ${FRONTEND_DEPLOY_PATH}
+
+          # Stop  frontend en cours
+          pkill -f "http-server .* -p 3000" || true
+          pkill -f "http-server.*3000" || true
+
+          # Start static server in background
+          nohup http-server . -p 3000 > frontend.log 2>&1 &
+        '
+      """
+    }
+  }
+
+
+
   }
 }
