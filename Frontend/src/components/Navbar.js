@@ -38,10 +38,10 @@ export default function Navbar() {
 
                 </div>
                 <div className="navbar-right">
-                    <a className="navbar-brand" href="/Home">messagerie</a>
-                    <a className="navbar-brand" href="/Home">notification</a>
-                    <a className="navbar-brand" href="/Home">about</a>
-
+                    <Link className="navbar-brand" to="/Home">messagerie</Link>
+                    <Link className="navbar-brand" to="/Publication">publication</Link>
+                    <Link className="navbar-brand" to="/Home">notification</Link>
+                    <Link className="navbar-brand" to="/Home">about</Link>
                     <Link to="/Profil" className="user-name">
                         {user ? `${user.nom} ${user.prenom}` : "Profil"}                  </Link>
                 </div>

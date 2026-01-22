@@ -41,4 +41,9 @@ public class ProfilController {
         }
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
+    @GetMapping("/monProfil/{id}")
+    public Profil monProfil(@PathVariable Long id) {
+        return profilService.getMonProfil(id);
+    }
+
 }

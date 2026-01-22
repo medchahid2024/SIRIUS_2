@@ -1,6 +1,7 @@
 import "../styles/Profil.css";
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
+import {getMesAmis} from "../API/api";
 
 
 export default function Profil() {
@@ -20,8 +21,7 @@ export default function Profil() {
     useEffect(() => {
         if (!user?.idUtilisateur) return;
 
-        fetch(`http://localhost:8080/MyUpec/ami/mesAmis/${user.idUtilisateur}`)
-            .then((r) => r.json())
+        getMesAmis(user.idUtilisateur)
             .then((data) => setFriends(Array.isArray(data) ? data : []))
             .catch(console.error);
     }, [user?.idUtilisateur]);
@@ -88,7 +88,6 @@ export default function Profil() {
 
                 <aside className="profil-right">
                     <div className="card">
-                        <h3></h3>
                         <ul>
 
                         </ul>

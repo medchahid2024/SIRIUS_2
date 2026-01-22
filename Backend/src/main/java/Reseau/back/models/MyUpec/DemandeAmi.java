@@ -23,6 +23,7 @@ public class DemandeAmi {
     @Temporal(TemporalType.DATE)
     private Date dateReponse;
 
+
     @Enumerated(EnumType.STRING)
     @Column(name = "statutdemande", length = 20, nullable = false)
     private StatutDemande statutDemande;
