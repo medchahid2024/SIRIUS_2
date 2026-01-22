@@ -13,6 +13,7 @@ pipeline {
     FRONTEND_DEPLOY_PATH = "/home/server/front"
 
     SSH_PASSWORD = "server"
+    RUN_SCRIPT = "/home/server/run.sh"
   }
 
   stages {
@@ -42,34 +43,28 @@ pipeline {
     stage('Deploy (replace)') {
       steps {
         sh """
-          echo "=== BACKEND: overwrite jar ==="
-          sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "mkdir -p ${BACKEND_DEPLOY_PATH}"
+          echo "=== Create remote folders ==="
+          sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "
+            mkdir -p ${BACKEND_DEPLOY_PATH}
+            mkdir -p ${FRONTEND_DEPLOY_PATH}
+          "
+
+          echo "=== Upload backend jar ==="
           sshpass -p '${SSH_PASSWORD}' scp -o StrictHostKeyChecking=no ${BACKEND_DIR}/target/${BACKEND_JAR} ${DEPLOY_USER}@${DEPLOY_HOST}:${BACKEND_DEPLOY_PATH}/${BACKEND_JAR}
 
-          echo "=== FRONTEND: mirror build (delete old files) ==="
-          sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "mkdir -p ${FRONTEND_DEPLOY_PATH}"
+          echo "=== Upload frontend build ==="
           sshpass -p '${SSH_PASSWORD}' rsync -av --delete -e "ssh -o StrictHostKeyChecking=no" ${FRONTEND_DIR}/build/ ${DEPLOY_USER}@${DEPLOY_HOST}:${FRONTEND_DEPLOY_PATH}/
         """
       }
     }
 
-    stage('Run (restart backend & frontend)') {
+    stage('Run on VM') {
       steps {
         sh """
-          echo "=== BACKEND: stop old + start new ==="
-          sshpass -p '${SSH_PASSWORD}' ssh -tt -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "
-            set -e
-            cd ${BACKEND_DEPLOY_PATH}
-            pkill -f 'java -jar ${BACKEND_JAR}' || true
-            nohup java -jar ${BACKEND_JAR} --spring.profiles.active=vm > backend.log 2>&1 &
-          "
-
-          echo "=== FRONTEND: stop old + start new ==="
-          sshpass -p '${SSH_PASSWORD}' ssh -tt -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "
-            set -e
-            cd ${FRONTEND_DEPLOY_PATH}
-            pkill -f 'http-server.*3000' || true
-            nohup http-server . -p 3000 > frontend.log 2>&1 &
+          echo "=== Run  script ==="
+          sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "
+            chmod +x ${RUN_SCRIPT}
+            ${RUN_SCRIPT}
           "
         """
       }
