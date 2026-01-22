@@ -12,3 +12,4 @@ WI6  Dashboard stats                             |  GUI       | OK     |Je cliqu
 
 test
 test 1
+test 2
