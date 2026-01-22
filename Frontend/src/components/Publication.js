@@ -22,7 +22,7 @@ export default function Publication() {
       return;
     }
 
-    fetch(`http://localhost:8080/MyUpec/publication/interacted/${userId}`)
+    fetch(`http://172.31.253.154:8080/MyUpec/publication/interacted/${userId}`)
       .then((res) => {
         if (!res.ok) throw new Error("Erreur API: " + res.status);
         return res.json();
