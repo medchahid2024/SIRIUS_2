@@ -46,9 +46,16 @@ public List<AffichageAmis> affichageAmis(Long idUser) {
         Long m = (v.getNbMasculin()*100)/total;
         Long f = (v.getNbFeminin()*100)/total;
         Long inc = (v.getNbInconnu()*100)/total;
+        System.out.println("------ nombre total des amis :"+total);
+        System.out.println("---Calcul Homme:" + v.getNbMasculin()+"*100 /"+total );
+        System.out.println("---Calcul Femme:" + v.getNbFeminin()+"*100 /"+total);
+        System.out.println("---Case vide:" +v.getNbInconnu()+" * 100 /"+total) ;
+
+
         System.out.println("HOMME:"+m+"%");
         System.out.println("FEMME:"+f+"%");
         System.out.println("CASE SEXE VIDE:"+inc+"%");
+
         return new SexePctDto(m,f,inc);
 
     }
