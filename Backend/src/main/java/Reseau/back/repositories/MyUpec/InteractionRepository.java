@@ -1,8 +1,6 @@
 package Reseau.back.repositories.MyUpec;
 
 import Reseau.back.models.MyUpec.Interaction;
-import Reseau.back.models.MyUpec.Publication;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -36,14 +34,12 @@ public interface InteractionRepository extends JpaRepository<Interaction, Long> 
 
     @Query(
         value = """
-            SELECT p.*
-            FROM publication p
-            LEFT JOIN interaction i
-                ON i.idpublication = p.idpublication
-                AND i.idutilisateur = :userId
-            WHERE i.idinteraction IS NULL
+            SELECT i.typeinteraction, p.typepublication
+            FROM interaction i
+            JOIN publication p ON p.idpublication = i.idpublication
+            WHERE i.idutilisateur = :userId
         """,
         nativeQuery = true
     )
-    List<Publication> findPublicationsNotInteractedByUser(@Param("userId") Long userId);
+    List<Object[]> findUserInteractionsWithTags(@Param("userId") Long userId);
 }

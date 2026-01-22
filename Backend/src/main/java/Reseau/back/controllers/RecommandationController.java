@@ -12,7 +12,6 @@ public class RecommandationController {
     @Autowired
     private RecommandationService recommandationService;
 
-    // Lance le calcul V1 et affiche la liste en console backend
     @GetMapping("/v1/{userId}")
     public ResponseEntity<String> lancerRecoV1(@PathVariable Long userId) {
         recommandationService.afficherScoresV1(userId);
