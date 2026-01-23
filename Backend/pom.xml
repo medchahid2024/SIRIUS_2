@@ -111,4 +111,20 @@
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>local</id>
+      <properties>
+        <spring-boot.run.profiles>local</spring-boot.run.profiles>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>vm</id>
+      <properties>
+        <spring-boot.run.profiles>vm</spring-boot.run.profiles>
+      </properties>
+    </profile>
+  </profiles>
+
 </project>
