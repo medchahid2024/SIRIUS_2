@@ -30,12 +30,12 @@ export default function Messagerie() {
     const [text, setText] = useState("");
     const [error, setError] = useState("");
 
-    // presence / typing
+
     const [onlineSet, setOnlineSet] = useState(new Set());
     const [otherTyping, setOtherTyping] = useState(false);
     const typingTimerRef = useRef(null);
 
-    // websocket refs
+
     const stompRef = useRef(null);
     const subMsgRef = useRef(null);
     const subTypingRef = useRef(null);
@@ -72,7 +72,7 @@ export default function Messagerie() {
             try {
                 await loadMessages(convId, user.idUtilisateur);
 
-                // mark as read + refresh inbox counts
+
                 markConversationRead(convId, user.idUtilisateur).catch(() => {});
                 refreshInbox(user.idUtilisateur).catch(() => {});
 
@@ -86,13 +86,13 @@ export default function Messagerie() {
         [user?.idUtilisateur, loadMessages, refreshInbox]
     );
 
-    // user depuis localStorage
+
     useEffect(() => {
         const u = localStorage.getItem("user");
         if (u) setUser(JSON.parse(u));
     }, []);
 
-    // auto-refresh inbox (polling fallback)
+
     useEffect(() => {
         if (!user?.idUtilisateur) return;
 
@@ -100,13 +100,13 @@ export default function Messagerie() {
             try {
                 await refreshInbox(user.idUtilisateur);
 
-                // fallback: refresh messages too (si websocket down)
+
                 if (activeConv) {
                     await loadMessages(activeConv, user.idUtilisateur);
                     markConversationRead(activeConv, user.idUtilisateur).catch(() => {});
                 }
             } catch {
-                // ignore
+
             }
         };
 
@@ -115,7 +115,7 @@ export default function Messagerie() {
         return () => clearInterval(id);
     }, [user?.idUtilisateur, refreshInbox, loadMessages, activeConv]);
 
-    // Nouveau message via /Messagerie?to=ID
+
     useEffect(() => {
         if (!user?.idUtilisateur || !toParam) return;
 
@@ -138,8 +138,8 @@ export default function Messagerie() {
         })();
     }, [toParam, user?.idUtilisateur, setSearchParams, openConversation]);
 
-    // ✅ Retour inbox depuis Navbar: /Messagerie?inbox=1&t=xxxx
-    // Important: on refreshInbox d'abord, puis on reset l'écran, puis on retire les params.
+
+
     useEffect(() => {
         if (!inboxParam) return;
         if (!user?.idUtilisateur) return;
@@ -149,7 +149,7 @@ export default function Messagerie() {
             try {
                 await refreshInbox(user.idUtilisateur);
             } catch {
-                // ignore
+
             }
 
             setActiveConv(null);
@@ -169,21 +169,17 @@ export default function Messagerie() {
         setSearchParams,
     ]);
 
-    // Auto-scroll quand un message arrive
     useEffect(() => {
         endRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages.length]);
 
-    // Init websocket once (presence)
     useEffect(() => {
         if (!user?.idUtilisateur) return;
 
-        // load initial online list
         getOnlineUsers()
             .then((ids) => setOnlineSet(new Set(ids || [])))
             .catch(() => {});
 
-        // connect if not already
         if (stompRef.current) return;
 
         const client = new Client({
@@ -201,7 +197,7 @@ export default function Messagerie() {
                     });
                 });
 
-                // register presence
+
                 client.publish({
                     destination: "/app/presence/register",
                     body: JSON.stringify({ userId: user.idUtilisateur }),
@@ -218,12 +214,12 @@ export default function Messagerie() {
         };
     }, [user?.idUtilisateur, wsUrl]);
 
-    // Subscribe to active conversation events (messages + typing)
+
     useEffect(() => {
         const client = stompRef.current;
         if (!client || !client.connected || !activeConv || !user?.idUtilisateur) return;
 
-        // cleanup old subs
+
         subMsgRef.current?.unsubscribe();
         subTypingRef.current?.unsubscribe();
         subMsgRef.current = null;
@@ -319,7 +315,7 @@ export default function Messagerie() {
                 markConversationRead(activeConv, user.idUtilisateur).catch(() => {});
             }
         } catch {
-            // ignore
+
         }
     };
 

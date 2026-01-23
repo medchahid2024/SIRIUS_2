@@ -5,7 +5,7 @@ export default function Publication() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Récupérer l'utilisateur connecté depuis localStorage
+
     const u = localStorage.getItem("user");
     if (!u) {
       setError("Aucun utilisateur connecté (localStorage user vide).");
@@ -14,7 +14,7 @@ export default function Publication() {
 
     const user = JSON.parse(u);
 
-    // ✅ IMPORTANT : adapte le champ si besoin (idUtilisateur vs idutilisateur)
+
     const userId = user.idUtilisateur ?? user.idutilisateur;
 
     if (!userId) {

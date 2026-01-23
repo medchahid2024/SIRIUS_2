@@ -25,13 +25,13 @@ public class MessagerieService {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
-    // si websocket activé
+
     @Autowired(required = false)
     private SimpMessagingTemplate messagingTemplate;
 
     public record UserMiniDto(Long idUtilisateur, String nom, String prenom) {}
 
-    // ✅ ajout unreadCount
+
     public record ConversationDto(Long idConversation, UserMiniDto other,
                                   String lastMessage, Instant lastMessageAt,
                                   long unreadCount) {}
@@ -39,7 +39,7 @@ public class MessagerieService {
     public record MessageDto(Long idMessage, Long conversationId, Long senderId,
                              String senderNom, String senderPrenom, String contenu, Instant sentAt) {}
 
-    // ✅ total unread (navbar)
+
     @Transactional(readOnly = true)
     public long totalUnread(Long userId) {
         return messageRepository.countTotalUnread(userId);
@@ -111,7 +111,7 @@ public class MessagerieService {
 
         MessageDto dto = toMessageDto(saved);
 
-        // temps réel: push à tous les abonnés de la conversation
+
         if (messagingTemplate != null) {
             messagingTemplate.convertAndSend("/topic/conversations/" + conversationId, dto);
         }
@@ -141,7 +141,7 @@ public class MessagerieService {
         try {
             unread = messageRepository.countUnreadForConversation(c.getIdConversation(), viewerId);
         } catch (Exception ignored) {
-            // si la table conversation_read n'existe pas encore, ça évite de casser l'app
+
             unread = 0;
         }
 

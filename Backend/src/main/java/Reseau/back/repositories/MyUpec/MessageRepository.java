@@ -16,13 +16,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     Optional<Message> findTop1ByConversation_IdConversationOrderBySentAtDesc(Long idConversation);
 
-    /**
-     * Compte les messages non lus pour une conversation.
-     * Requiert la table conversation_read (conversationId, userId, last_read_at).
-     *
-     * ⚠️ Si tes noms de colonnes diffèrent (sent_at / idutilisateur / idconversation),
-     * adapte la requête.
-     */
+
     @Query(value = """
         select count(*)
         from message m
@@ -36,9 +30,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     long countUnreadForConversation(@Param("conversationId") Long conversationId,
                                     @Param("userId") Long userId);
 
-    /**
-     * Compte tous les messages non lus (toutes conversations) pour un user.
-     */
+
     @Query(value = """
         select count(*)
         from message m

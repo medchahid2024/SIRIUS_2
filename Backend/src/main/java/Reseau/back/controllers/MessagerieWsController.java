@@ -19,7 +19,7 @@ public class MessagerieWsController {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    // userId -> number of active sessions
+
     private final Map<Long, Integer> onlineCounts = new ConcurrentHashMap<>();
 
     public MessagerieWsController(SimpMessagingTemplate messagingTemplate) {
@@ -72,7 +72,7 @@ public class MessagerieWsController {
         messagingTemplate.convertAndSend("/topic/conversations/" + conversationId + "/typing", req);
     }
 
-    // Optionnel: endpoint REST pour l’état initial (liste des online)
+
     public Set<Long> getOnlineUsers() {
         return onlineCounts.keySet();
     }

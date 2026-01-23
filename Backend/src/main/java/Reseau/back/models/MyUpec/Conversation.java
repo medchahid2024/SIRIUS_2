@@ -26,7 +26,7 @@ public class Conversation {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    // DM: 2 participants stockés via une table de jointure
+
     @JsonIgnore
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

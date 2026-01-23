@@ -29,7 +29,7 @@ export default function Navbar() {
         return () => clearInterval(id);
     }, [user?.idUtilisateur]);
 
-    // ✅ always forces a navigation event
+
     const goMessagerieInbox = () => {
         navigate(`/Messagerie?inbox=1&t=${Date.now()}`);
     };
@@ -68,7 +68,7 @@ export default function Navbar() {
                 </div>
 
                 <div className="navbar-right d-flex align-items-center gap-3">
-                    {/* ✅ button that navigates (works even if already on /Messagerie) */}
+                    {}
                     <button
                         type="button"
                         onClick={goMessagerieInbox}

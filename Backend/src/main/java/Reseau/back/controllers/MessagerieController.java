@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/MyUpec/messagerie")
-public class MessagerieController {
+public class   MessagerieController {
     @Autowired
     private Reseau.back.repositories.MyUpec.ConversationReadRepository conversationReadRepository;
 
