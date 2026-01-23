@@ -14,7 +14,7 @@ ZOUAK HAMZAOUI Abdessalam - Scope fil d'actualité
 
 R1 — Recommandation basée sur les interactions (US réalisées)
 
-Les fonctionnalités suivantes ont été implémentées pour le module Fil d’actualité personnalisé (R1) :
+Les fonctionnalités suivantes ont été implémentées pour le module Fil d’actualité personnalisé [R1] :
 
 US1 - Exploiter l’historique d’interactions utilisateur
 Prise en compte des interactions passées de l’utilisateur (likes, commentaires, consultations) pour influencer la recommandation des publications.
