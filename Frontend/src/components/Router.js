@@ -6,30 +6,32 @@ import Authentification from "./Authentification";
 import Home from "./Home";
 import Statistiques from "./Statistiques";
 import Publication from "./Publication";
+import Messagerie from "./Messagerie";
 
 export default function Router() {
-  return (
-    <BrowserRouter>
-      <div>
-        <Routes>
-          <Route path="/login" element={<Authentification />} />
-          <Route
-            path="/*"
-            element={
-              <>
-                <Navbar />
+    return (
+        <BrowserRouter>
+            <div>
                 <Routes>
-                  <Route path="/" element={<Navigate to="/login" replace />} />
-                  <Route path="/Home" element={<Home />} />
-                  <Route path="/Profil" element={<Profil />} />
-                  <Route path="/Publication" element={<Publication />} />
-                  <Route path="/Statistiques/:id" element={<Statistiques />} />
+                    <Route path="/login" element={<Authentification />} />
+                    <Route
+                        path="/*"
+                        element={
+                            <>
+                                <Navbar />
+                                <Routes>
+                                    <Route path="/" element={<Navigate to="/login" replace />} />
+                                    <Route path="/Home" element={<Home />} />
+                                    <Route path="/Profil" element={<Profil />} />
+                                    <Route path="/Publication" element={<Publication />} />
+                                    <Route path="/Statistiques/:id" element={<Statistiques />} />
+                                    <Route path="/Messagerie" element={<Messagerie />} />
+                                </Routes>
+                            </>
+                        }
+                    />
                 </Routes>
-              </>
-            }
-          />
-        </Routes>
-      </div>
-    </BrowserRouter>
-  );
+            </div>
+        </BrowserRouter>
+    );
 }
