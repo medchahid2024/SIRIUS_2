@@ -25,3 +25,24 @@ WI5  Réception du message                        |  GUI       | OK     |Quand l
 
 
 
+
+ZOUAK HAMZAOUI Abdessalam - Scope fil d'actualité
+
+R1 — Recommandation basée sur les interactions (US réalisées)
+
+Les fonctionnalités suivantes ont été implémentées pour le module Fil d’actualité personnalisé [R1] :
+
+US1 - Exploiter l’historique d’interactions utilisateur
+Prise en compte des interactions passées de l’utilisateur (likes, commentaires, consultations) pour influencer la recommandation des publications.
+
+US2 - Calcul du score de similarité d’un post
+Calcul d’un score de recommandation pour chaque publication en fonction de la similarité avec les contenus déjà appréciés ou consultés par l’utilisateur.
+
+US3 - Pondération des interactions
+Les différents types d’interactions sont pondérés (ex. : un like a plus d’impact qu’une simple consultation).
+
+US4 - Classement des publications
+Les publications sont triées par ordre décroissant selon leur score de pertinence calculé.
+
+US5 - Exposition du fil personnalisé
+Le fil d’actualité affiche en priorité les publications les plus pertinentes pour l’utilisateur, avec chargement progressif (pagination).
