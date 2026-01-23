@@ -2,17 +2,18 @@ pipeline {
   agent any
 
   environment {
-    BACKEND_DIR = "Backend"
+    BACKEND_DIR  = "Backend"
     FRONTEND_DIR = "Frontend"
-    BACKEND_JAR = "Backend-1.0-SNAPSHOT.jar"
+    BACKEND_JAR  = "Backend-1.0-SNAPSHOT.jar"
 
     DEPLOY_USER = "server"
     DEPLOY_HOST = "172.31.253.154"
 
-    BACKEND_DEPLOY_PATH = "/home/server/back"
+    BACKEND_DEPLOY_PATH  = "/home/server/back"
     FRONTEND_DEPLOY_PATH = "/home/server/front"
 
     SSH_PASSWORD = "server"
+    RUN_SCRIPT = "/home/server/run.sh"
   }
 
   stages {
@@ -42,13 +43,29 @@ pipeline {
     stage('Deploy (replace)') {
       steps {
         sh """
-          echo "=== BACKEND: overwrite jar ==="
-          sshpass -p ${SSH_PASSWORD} ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "mkdir -p ${BACKEND_DEPLOY_PATH}"
-          sshpass -p ${SSH_PASSWORD} scp -o StrictHostKeyChecking=no ${BACKEND_DIR}/target/${BACKEND_JAR} ${DEPLOY_USER}@${DEPLOY_HOST}:${BACKEND_DEPLOY_PATH}/${BACKEND_JAR}
+          echo "=== Create remote folders ==="
+          sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "
+            mkdir -p ${BACKEND_DEPLOY_PATH}
+            mkdir -p ${FRONTEND_DEPLOY_PATH}
+          "
 
-          echo "=== FRONTEND: mirror build (delete old files) ==="
-          sshpass -p ${SSH_PASSWORD} ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "mkdir -p ${FRONTEND_DEPLOY_PATH}"
-          sshpass -p ${SSH_PASSWORD} rsync -av --delete -e "ssh -o StrictHostKeyChecking=no" ${FRONTEND_DIR}/build/ ${DEPLOY_USER}@${DEPLOY_HOST}:${FRONTEND_DEPLOY_PATH}/
+          echo "=== Upload backend jar ==="
+          sshpass -p '${SSH_PASSWORD}' scp -o StrictHostKeyChecking=no ${BACKEND_DIR}/target/${BACKEND_JAR} ${DEPLOY_USER}@${DEPLOY_HOST}:${BACKEND_DEPLOY_PATH}/${BACKEND_JAR}
+
+          echo "=== Upload frontend build ==="
+          sshpass -p '${SSH_PASSWORD}' rsync -av --delete -e "ssh -o StrictHostKeyChecking=no" ${FRONTEND_DIR}/build/ ${DEPLOY_USER}@${DEPLOY_HOST}:${FRONTEND_DEPLOY_PATH}/
+        """
+      }
+    }
+
+    stage('Run on VM') {
+      steps {
+        sh """
+          echo "=== Run  script ==="
+          sshpass -p '${SSH_PASSWORD}' ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "
+            chmod +x ${RUN_SCRIPT}
+            ${RUN_SCRIPT}
+          "
         """
       }
     }
