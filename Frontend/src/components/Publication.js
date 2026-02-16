@@ -23,7 +23,7 @@ export default function Publication() {
 
       const currentOffset = reset ? 0 : offset;
 
-      const res = await fetch(`http://localhost:8080/api/feed/${userId}?offset=${currentOffset}&limit=${limit}`);
+      const res = await fetch(`http://172.31.252.250:8080/api/feed/${userId}?offset=${currentOffset}&limit=${limit}`);
       if (!res.ok) throw new Error("Erreur API: " + res.status);
 
       const data = await res.json();
