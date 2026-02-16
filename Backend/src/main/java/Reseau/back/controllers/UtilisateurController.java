@@ -12,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/MyUpec/utilisateur")
-@CrossOrigin("http://localhost:3000")
 public class UtilisateurController {
 
     @Autowired
