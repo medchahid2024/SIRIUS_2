@@ -26,12 +26,12 @@ export default function Statistiques() {
                 { name: "pas rempli", value: sexeRes?.pctInconnu  },
             ]);
                 setNatData((natRes ?? []).map((x) => ({ name: x.nationalite, value: x.nb })));
-            setScoreData(
-                (scoreRes ?? []).map((x) => ({ name: `Ami ${x.id}`,
-                    value: x.score ,
-                }))
-            );
-        });
+                setScoreData(
+                    (scoreRes ?? []).map((x) => ({ name: `Ami ${x.id}`,
+                        value: x.score ,
+                    }))
+                );
+            });
     }, [userId]);
 
 

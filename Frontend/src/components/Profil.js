@@ -9,14 +9,10 @@ export default function Profil() {
     const [friends, setFriends] = useState([]);
     const [afficheAmis, setafficheAmis] = useState(false);
 
-
-
-
-    useEffect(() => {const u = localStorage.getItem("user");
+    useEffect(() => {
+        const u = localStorage.getItem("user");
         if (u) setUser(JSON.parse(u));
     }, []);
-
-
 
     useEffect(() => {
         if (!user?.idUtilisateur) return;
@@ -26,23 +22,16 @@ export default function Profil() {
             .catch(console.error);
     }, [user?.idUtilisateur]);
 
-
     return (
-
         <div className="profil-page">
-
-
             <div className="profil-banner"></div>
 
-
             <div className="profil-card">
-
                 <h2>{user ? `${user.nom} ${user.prenom}` : "Profil"} </h2>
-                <Link to={`/Statistiques/${user?.idUtilisateur }`}>
+
+                <Link to={`/Statistiques/${user?.idUtilisateur}`}>
                     <p className="profil-title">Voir les statistiques</p>
                 </Link>
-
-
 
                 <p
                     className="profil-title"
@@ -52,29 +41,42 @@ export default function Profil() {
                     Mes amis ({friends.length})
                 </p>
 
-
                 {afficheAmis && (
                     <div className="friends-list">
                         {friends.map((f) => (
-                            <div className="friend-item" key={f.idUtilisateur}>
-                                <div>{f.nom} {f.prenom}</div>
+                            <div
+                                className="friend-item"
+                                key={f.idUtilisateur}
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    gap: 12,
+                                }}
+                            >
+                                <div>
+                                    {f.nom} {f.prenom}
+                                </div>
+
+                                <Link
+                                    to={`/Messagerie?to=${f.idUtilisateur}`}
+                                    className="btn btn-sm btn-outline-danger"
+                                >
+                                    Nouveau message
+                                </Link>
                             </div>
                         ))}
                     </div>
                 )}
 
-
                 <p className="profil-location">France</p>
             </div>
 
             <div className="profil-layout">
-
                 <aside className="profil-left">
                     <div className="card">
                         <h3>À propos</h3>
-                        <p>
-
-                        </p>
+                        <p></p>
                     </div>
                 </aside>
 
@@ -88,12 +90,9 @@ export default function Profil() {
 
                 <aside className="profil-right">
                     <div className="card">
-                        <ul>
-
-                        </ul>
+                        <ul></ul>
                     </div>
                 </aside>
-
             </div>
         </div>
     );

@@ -18,7 +18,7 @@ export default function Authentification() {
             const user = await login(email, password);localStorage.setItem("user", JSON.stringify(user));
             navigate("/Home");
         } catch (err) {
-             if (err.response?.status === 401) setError("Email ou mot de passe incorrect.");
+            if (err.response?.status === 401) setError("Email ou mot de passe incorrect.");
             else setError("Erreur serveur.");
         }
     };
@@ -27,27 +27,27 @@ export default function Authentification() {
         <div className="authentification">
             <div className="auth-box">
 
-                    <img src={logo} className="episen" width={170} height={100} alt="logo"/>
+                <img src={logo} className="episen" width={170} height={100} alt="logo"/>
                 <h2>Se connecter </h2>
-        <form onSubmit={submit} className="form">
-            <input
-                type="text"
-                placeholder="Entrez votre email"
-                className="input-group"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-                type="password"
-                className="input-group"
-                placeholder="Entrez votre mot de passe"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
-            <button type="submit">Login</button>
-            {error && <div style={{ color: "black" }}>{error}</div>}
-        </form>
-        </div>
+                <form onSubmit={submit} className="form">
+                    <input
+                        type="text"
+                        placeholder="Entrez votre email"
+                        className="input-group"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <input
+                        type="password"
+                        className="input-group"
+                        placeholder="Entrez votre mot de passe"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button type="submit">Login</button>
+                    {error && <div style={{ color: "black" }}>{error}</div>}
+                </form>
+            </div>
         </div>
     );
 }
