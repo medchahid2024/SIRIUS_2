@@ -69,3 +69,5 @@ Les publications sont triées par ordre décroissant selon leur score de pertine
 
 US5 - Exposition du fil personnalisé
 Le fil d’actualité affiche en priorité les publications les plus pertinentes pour l’utilisateur, avec chargement progressif (pagination).
+
+Test R2
