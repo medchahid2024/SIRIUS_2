@@ -1,10 +1,7 @@
 package Reseau.back.services.MyUpec;
 
-import Reseau.back.Counters.AffichageAmis;
-import Reseau.back.Counters.AfficheBestAmis;
+import Reseau.back.Counters.*;
 import Reseau.back.repositories.MyUpec.DemandeAmiRepository;
-import Reseau.back.Counters.NationaliteCountView;
-import Reseau.back.Counters.SexeCountsView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +54,12 @@ public List<AffichageAmis> affichageAmis(Long idUser) {
 
 
     public List<NationaliteCountView> countNationaliteAmisAcceptes(Long idUser) {
-        return demandeAmiRepository.countAmisParNationalite(idUser);
+    return demandeAmiRepository.countAmisParNationalite(idUser);
     }
-
+    public List<AmisRecommandees> getSuggestions(Long myId, Long amiId) {
+        if (myId.equals(amiId)) {
+            throw new IllegalArgumentException("Impossible de recommander cet ami.");
+        }
+        return demandeAmiRepository.affichageAmisRecommandees(myId, amiId);
+    }
 }

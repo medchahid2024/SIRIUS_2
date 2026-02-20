@@ -1,9 +1,6 @@
 package Reseau.back.controllers;
 
-import Reseau.back.Counters.AffichageAmis;
-import Reseau.back.Counters.AfficheBestAmis;
-import Reseau.back.Counters.NationaliteCountView;
-import Reseau.back.Counters.SexeCountsView;
+import Reseau.back.Counters.*;
 import Reseau.back.models.MyUpec.Utilisateur;
 import Reseau.back.services.MyUpec.DemandeAmiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +39,16 @@ public class DemandeAmiController {
     public ResponseEntity<List<AfficheBestAmis>> getMyBestFriends(@PathVariable Long id) {
 
         return ResponseEntity.ok(service.AffichageMeilleureAmis(id));
+    }
+
+    @GetMapping("/suggestion/{id}")
+    public ResponseEntity<List<AmisRecommandees>> getRecommendations(
+            @PathVariable Long id,
+            @RequestParam Long myId
+    ) {
+        return ResponseEntity.ok(
+                service.getSuggestions(myId,id)
+        );
     }
 
 }

@@ -1,9 +1,6 @@
 package Reseau.back.repositories.MyUpec;
 
-import Reseau.back.Counters.AffichageAmis;
-import Reseau.back.Counters.NationaliteCountView;
-import Reseau.back.Counters.SexeCountsView;
-import Reseau.back.Counters.AfficheBestAmis;
+import Reseau.back.Counters.*;
 import Reseau.back.models.MyUpec.DemandeAmi;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -104,4 +101,37 @@ ORDER BY nb_jaime_sur_mes_publications DESC LIMIT 10;
 """,nativeQuery = true)
 List<AfficheBestAmis> AffichageMeilleureAmis(@Param("myId") Long idUser);
 
-}
+
+
+
+    @Query(value = """
+WITH amis_de_mon_ami AS (
+SELECT DISTINCT
+    CASE
+     WHEN da.idemetteur = :amiId THEN da.idrecepteur
+      ELSE da.idemetteur
+     END AS suggestion_id
+    FROM demandeami da
+    WHERE (da.idemetteur = :amiId OR da.idrecepteur = :amiId)
+      AND da.statutdemande = 'ACCEPTEE'
+)
+
+SELECT
+    ada.suggestion_id  AS amiId,
+    pr.etablissement    AS etablissement,
+    pr.nationalite      AS nationalite,
+  u.nom AS nom,
+u.prenom AS prenom
+FROM amis_de_mon_ami ada
+JOIN profil pr ON pr.idutilisateur = ada.suggestion_id JOIN utilisateur u ON u.idutilisateur = pr.idutilisateur
+WHERE ada.suggestion_id != :myId
+ORDER BY ada.suggestion_id ASC LIMIT 15
+""", nativeQuery = true)
+    List<AmisRecommandees> affichageAmisRecommandees(
+            @Param("myId") Long myId,
+            @Param("amiId") Long amiId
+    );
+
+
+    }
+
