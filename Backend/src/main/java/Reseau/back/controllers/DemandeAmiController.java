@@ -2,6 +2,7 @@ package Reseau.back.controllers;
 
 import Reseau.back.Counters.*;
 import Reseau.back.models.MyUpec.Utilisateur;
+import Reseau.back.services.MyUpec.AmisRecommandeesService;
 import Reseau.back.services.MyUpec.DemandeAmiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,8 @@ public class DemandeAmiController {
 
     @Autowired
     private  DemandeAmiService service;
-
+    @Autowired
+private AmisRecommandeesService amisRecommandeesService;
 
     @GetMapping("/{id}")
     public ResponseEntity<SexeCountsView> getStatsAmis(@PathVariable("id") Long id) {
@@ -42,13 +44,11 @@ public class DemandeAmiController {
     }
 
     @GetMapping("/suggestion/{id}")
-    public ResponseEntity<List<AmisRecommandees>> getRecommendations(
+    public ResponseEntity<List<AmisRecommandeesService.RecommandationResultat>> getRecommendations(
             @PathVariable Long id,
-            @RequestParam Long myId
-    ) {
-        return ResponseEntity.ok(
-                service.getSuggestions(myId,id)
-        );
+            @RequestParam Long myId) {
+        return ResponseEntity.ok(amisRecommandeesService.recommanderAmis(myId,id));
     }
+
 
 }

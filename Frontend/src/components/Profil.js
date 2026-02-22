@@ -54,9 +54,11 @@ export default function Profil() {
                                     gap: 12,
                                 }}
                             >
-                                <div>
+                                <Link
+                                    to={`/ProfilAmi?to=${f.idUtilisateur}`}
+                                >
                                     {f.nom} {f.prenom}
-                                </div>
+                                </Link>
 
                                 <Link
                                     to={`/Messagerie?to=${f.idUtilisateur}`}

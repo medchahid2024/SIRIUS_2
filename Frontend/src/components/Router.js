@@ -8,6 +8,10 @@ import Statistiques from "./Statistiques";
 import Publication from "./Publication";
 import Messagerie from "./Messagerie";
 
+function ProfilAmi() {
+    return null;
+}
+
 export default function Router() {
     return (
         <BrowserRouter>
@@ -26,6 +30,7 @@ export default function Router() {
                                     <Route path="/Publication" element={<Publication />} />
                                     <Route path="/Statistiques/:id" element={<Statistiques />} />
                                     <Route path="/Messagerie" element={<Messagerie />} />
+                                    <Route path="/ProfilAmi" element={<ProfilAmi />} />
                                 </Routes>
                             </>
                         }

@@ -56,10 +56,10 @@ public List<AffichageAmis> affichageAmis(Long idUser) {
     public List<NationaliteCountView> countNationaliteAmisAcceptes(Long idUser) {
     return demandeAmiRepository.countAmisParNationalite(idUser);
     }
-    public List<AmisRecommandees> getSuggestions(Long myId, Long amiId) {
-        if (myId.equals(amiId)) {
-            throw new IllegalArgumentException("Impossible de recommander cet ami.");
-        }
-        return demandeAmiRepository.affichageAmisRecommandees(myId, amiId);
-    }
+//    public List<AmisRecommandees> getSuggestions(Long myId, Long amiId) {
+//        if (myId.equals(amiId)) {
+//            throw new IllegalArgumentException("Impossible d'afficher la liste recommandee de cet ami.");
+//        }
+//        return demandeAmiRepository.affichageAmisRecommandees(myId, amiId);
+   // }
 }
