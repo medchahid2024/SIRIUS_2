@@ -52,3 +52,6 @@ export function getTotalUnread(userId) {
 export function getOnlineUsers() {
     return api.get(`/MyUpec/messagerie/presence/online`).then((r) => r.data);
 }
+export function getProfil(userId) {
+    return api.get(`/MyUpec/profil/monProfil/${userId}`).then((r) => r.data);
+}

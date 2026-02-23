@@ -7,10 +7,9 @@ import Home from "./Home";
 import Statistiques from "./Statistiques";
 import Publication from "./Publication";
 import Messagerie from "./Messagerie";
+import ProfilAmi from "./ProfilAmi";
 
-function ProfilAmi() {
-    return null;
-}
+
 
 export default function Router() {
     return (
