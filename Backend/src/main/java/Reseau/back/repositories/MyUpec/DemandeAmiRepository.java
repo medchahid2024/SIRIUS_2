@@ -56,7 +56,11 @@ SELECT
   u.idutilisateur AS idutilisateur,
   u.nom AS nom,
   u.prenom AS prenom,
-  p.photoprofil AS photo
+  p.photoprofil AS photo,
+  p.centresinteret AS centresinteret,
+  p.etablissement AS etablissement,
+  p.nationalite AS nationalite,
+  p.ville AS ville
 FROM demandeami d
 JOIN utilisateur u
   ON u.idutilisateur = CASE

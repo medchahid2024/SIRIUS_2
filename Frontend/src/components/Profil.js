@@ -1,13 +1,15 @@
 import "../styles/Profil.css";
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
-import {getMesAmis} from "../API/api";
+import {getMesAmis ,getProfil} from "../API/api";
 
 
 export default function Profil() {
     const [user, setUser] = useState(null);
     const [friends, setFriends] = useState([]);
     const [afficheAmis, setafficheAmis] = useState(false);
+    const [profil, setProfil] = useState(null);
+
 
     useEffect(() => {
         const u = localStorage.getItem("user");
@@ -20,13 +22,23 @@ export default function Profil() {
         getMesAmis(user.idUtilisateur)
             .then((data) => setFriends(Array.isArray(data) ? data : []))
             .catch(console.error);
+        getProfil(user.idUtilisateur)
+            .then((data) => setProfil(data))
+            .catch(console.error);
     }, [user?.idUtilisateur]);
 
-    return (
+        return (
         <div className="profil-page">
             <div className="profil-banner"></div>
 
             <div className="profil-card">
+                {profil?.photoProfil && (
+                    <img
+                        src={profil.photoProfil}
+                        alt="Photo de profil"
+                        style={{ width: 100, height: 100, borderRadius: "50%" }}
+                    />
+                )}
                 <h2>{user ? `${user.nom} ${user.prenom}` : "Profil"} </h2>
 
                 <Link to={`/Statistiques/${user?.idUtilisateur}`}>
@@ -36,7 +48,7 @@ export default function Profil() {
                 <p
                     className="profil-title"
                     onClick={() => setafficheAmis(!afficheAmis)}
-                    style={{ cursor: "pointer" }}
+                    style={{cursor: "pointer"}}
                 >
                     Mes amis ({friends.length})
                 </p>
@@ -78,7 +90,10 @@ export default function Profil() {
                 <aside className="profil-left">
                     <div className="card">
                         <h3>À propos</h3>
-                        <p></p>
+                        <p>{profil?.bio}</p>
+                        <p><strong>Établissement:</strong> {profil?.etablissement}</p>
+                        <p><strong>Nationalité:</strong> {profil?.nationalite}</p>
+                        <p><strong>Centres d'intérêt:</strong> {profil?.centresInteret}</p>
                     </div>
                 </aside>
 
