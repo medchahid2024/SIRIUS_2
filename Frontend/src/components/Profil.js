@@ -35,7 +35,7 @@ export default function Profil() {
                 {profil?.photoProfil && (
                     <img
                         src={profil.photoProfil}
-                        alt="Photo de profil"
+                        alt={`${user.prenom} ${user.nom}`}
                         style={{ width: 100, height: 100, borderRadius: "50%" }}
                     />
                 )}

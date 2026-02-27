@@ -49,6 +49,13 @@ export default function ProfilAmi() {
             </div>
         );
     }
+    if (chargement) {
+        return (
+            <div className="profil-page">
+                <p>Chargement</p>
+            </div>
+        );
+    }
 
     return (
         <div className="profil-page">
@@ -102,7 +109,9 @@ export default function ProfilAmi() {
                         {!chargementSuggestions && suggestions.length === 0 && (
                             <div>Aucune suggestion pour le moment.</div>
                         )}
+
                         <ul>
+
                             {suggestions.map((s) => (
                                 <li key={s.amiId} className="ProfilAmiLi">
                                     <div className="ProfilAmiDiv">
