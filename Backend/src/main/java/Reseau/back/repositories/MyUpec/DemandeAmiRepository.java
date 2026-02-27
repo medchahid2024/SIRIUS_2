@@ -124,6 +124,7 @@ SELECT
     ada.suggestion_id  AS amiId,
     pr.etablissement    AS etablissement,
     pr.nationalite      AS nationalite,
+    pr.photoprofil         AS photo,
   u.nom AS nom,
 u.prenom AS prenom
 FROM amis_de_mon_ami ada

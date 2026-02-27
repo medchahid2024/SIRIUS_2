@@ -1,6 +1,8 @@
 import { Link, useSearchParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import "../styles/ProfilAmi.css";
 import "../styles/Profil.css";
+
 import { getProfil,getSuggestionAmi } from "../API/api";
 
 
@@ -94,15 +96,25 @@ export default function ProfilAmi() {
                     </div>
                 </main>
 
-                <aside className="profil-right"><div className="card">
-                    <strong>Suggestion</strong>
+                <aside className="profil-right">
+                    <div className="card">
+                        <h4>Suggestions</h4>
                         {!chargementSuggestions && suggestions.length === 0 && (
                             <div>Aucune suggestion pour le moment.</div>
                         )}
-                        <ul>{suggestions.map((s) => (
-                                <li key={s.amiId}>
-                                    {s.prenom} {s.nom}
+                        <ul>
+                            {suggestions.map((s) => (
+                                <li key={s.amiId} className="ProfilAmiLi">
+                                    <div className="ProfilAmiDiv">
+                                        <img src={s.photo} alt="profil"/>
+                                        <span>{s.prenom} {s.nom}</span>
+                                        <br/>
+                                    </div>
 
+
+                                    <button className="btn btn-sm btn-outline-danger">
+                                        Ajouter
+                                    </button>
                                 </li>
                             ))}
                         </ul>

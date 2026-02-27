@@ -13,7 +13,8 @@ import java.util.List;
 
 @Service
 public class AmisRecommandeesService {
-    public record RecommandationResultat(Long amiId, String nom, String prenom, String nationalite, String etablissement, int score) {}
+    public record RecommandationResultat(Long amiId, String nom, String prenom, String nationalite, String etablissement,
+                                         String photo, int score) {}
 
     @Autowired
     private ProfilRepository profilRepository;
@@ -57,7 +58,7 @@ public class AmisRecommandeesService {
             System.out.println("------ Score  :"+ score);
 
             resultats.add(new RecommandationResultat(suggestion.getAmiId(), suggestion.getNom(), suggestion.getPrenom(), suggestion.getNationalite(),
-                    suggestion.getEtablissement(), score
+                    suggestion.getEtablissement(),suggestion.getPhoto() ,score
             ));
         }
         resultats.sort(Comparator.comparingInt(RecommandationResultat::score).reversed());

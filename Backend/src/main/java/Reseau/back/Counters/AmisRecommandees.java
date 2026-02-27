@@ -4,6 +4,7 @@ public interface AmisRecommandees {
     Long getAmiId();
     String getNationalite();
     String getEtablissement();
+    String getPhoto();
     String getNom();
     String getPrenom();
 }
