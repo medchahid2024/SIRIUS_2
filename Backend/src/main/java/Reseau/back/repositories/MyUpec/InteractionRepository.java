@@ -42,4 +42,39 @@ public interface InteractionRepository extends JpaRepository<Interaction, Long> 
         nativeQuery = true
     )
     List<Object[]> findUserInteractionsWithTags(@Param("userId") Long userId);
+   
+    @Query(
+    value = """
+        SELECT i.typeinteraction, p.typepublication
+        FROM interaction i
+        JOIN publication p ON p.idpublication = i.idpublication
+        WHERE i.idutilisateur IN (:userIds)
+    """,
+    nativeQuery = true
+)
+List<Object[]> findUsersInteractionsWithTags(@Param("userIds") List<Long> userIds);
+
+@Query(
+    value = """
+        SELECT i.idpublication, COUNT(*) AS nb
+        FROM interaction i
+        WHERE i.idutilisateur IN (:friendIds)
+          AND i.idpublication NOT IN (
+              SELECT DISTINCT i2.idpublication
+              FROM interaction i2
+              WHERE i2.idutilisateur = :userId
+          )
+        GROUP BY i.idpublication
+        ORDER BY nb DESC
+        LIMIT 500
+    """,
+    nativeQuery = true
+)
+List<Object[]> findFriendPopularPublicationsNotInteracted(
+        @Param("userId") Long userId,
+        @Param("friendIds") List<Long> friendIds
+);
+
+
+
 }
