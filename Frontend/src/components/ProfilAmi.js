@@ -57,7 +57,7 @@ export default function ProfilAmi() {
             <div className="profil-card">
                 <img
                     src={ami.photoProfil}
-                    alt="Photo de profil"
+                    alt={`${ami.utilisateur.nom} ${ami.utilisateur.prenom}`}
                     style={{width: 100, height: 100, borderRadius: "50%"}}
                 />
                 <h2>{ami.utilisateur.nom} {ami.utilisateur.prenom}</h2>
@@ -106,7 +106,7 @@ export default function ProfilAmi() {
                             {suggestions.map((s) => (
                                 <li key={s.amiId} className="ProfilAmiLi">
                                     <div className="ProfilAmiDiv">
-                                        <img src={s.photo} alt="profil"/>
+                                        <img src={s.photo} alt={`${s.prenom} ${s.nom}`}/>
                                         <span>{s.prenom} {s.nom}</span>
                                         <br/>
                                     </div>
