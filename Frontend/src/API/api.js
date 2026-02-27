@@ -54,4 +54,9 @@ export function getOnlineUsers() {
 }
 export function getProfil(userId) {
     return api.get(`/MyUpec/profil/monProfil/${userId}`).then((r) => r.data);
+
+
+}
+export function getSuggestionAmi(myId, amiId) {
+    return api.get(`/MyUpec/ami/suggestion/${amiId}`, {params: { myId },}).then((r) => r.data);
 }

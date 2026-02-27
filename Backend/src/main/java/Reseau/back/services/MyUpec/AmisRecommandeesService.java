@@ -32,6 +32,11 @@ public class AmisRecommandeesService {
 
         List<RecommandationResultat> resultats = new ArrayList<>();
 
+        System.out.println("-----------------------------------------------------------");
+        System.out.println("Bareme :"+ "10 points meme etablissement  5 point si meme nantionalite  1 point pour chaque interaction");
+        System.out.println("Utilisateur :"+myId);
+
+
         for (AmisRecommandees suggestion: suggestions) {
             int score = 0;
 
@@ -45,12 +50,17 @@ public class AmisRecommandeesService {
                 score += 5;
             }
 
+
+            System.out.println("monEtab  :" + monEtab+ " ------------- "+"Etablissement de mon amis :"+suggestion.getEtablissement());
+            System.out.println("maNat :" + maNat + " ----------------- " + "Nationalite de mon amis :" + suggestion.getNationalite());
+
+            System.out.println("------ Score  :"+ score);
+
             resultats.add(new RecommandationResultat(suggestion.getAmiId(), suggestion.getNom(), suggestion.getPrenom(), suggestion.getNationalite(),
                     suggestion.getEtablissement(), score
             ));
         }
         resultats.sort(Comparator.comparingInt(RecommandationResultat::score).reversed());
-
 
         return resultats;
     }

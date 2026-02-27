@@ -1,12 +1,20 @@
 import { Link, useSearchParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import "../styles/Profil.css";
-import { getProfil } from "../API/api";
+import { getProfil,getSuggestionAmi } from "../API/api";
+
+
 
 export default function ProfilAmi() {
     const [searchParams] = useSearchParams();
     const [ami, setAmi] = useState(null);
     const [chargement, setChargement] = useState(true);
+
+    const [suggestions, setSuggestions] = useState([]);
+    const [chargementSuggestions, setChargementSuggestions] = useState(false);
+
+    const user = localStorage.getItem("user");
+    const myId = JSON.parse(user || "null")?.idUtilisateur;
 
     const idAmi = searchParams.get("to");
 
@@ -23,6 +31,13 @@ export default function ProfilAmi() {
             .catch(() => {
                 setChargement(false);
             });}, [idAmi]);
+    useEffect(() => {
+        if (!idAmi || !myId) return;
+
+        setChargementSuggestions(true);
+        getSuggestionAmi(myId, idAmi).then((data) => {setSuggestions(data);
+            }).finally(() => setChargementSuggestions(false));
+    }, [idAmi, myId]);
 
     if (!ami) {
         return (
@@ -53,14 +68,14 @@ export default function ProfilAmi() {
                         Envoyer un message
                     </Link>
 
-                    <button  type="button" className="btn btn-outline-warning" > <strong>Ajouter</strong></button>
+                    <button  type="button" className="btn-outline-light" > <strong>Ajouter</strong></button>
 
                 </div>
 
             </div>
 
             <div className="profil-layout">
-            <aside className="profil-left">
+                <aside className="profil-left">
                     <div className="card">
                         <h3>À propos</h3>
                         <p>{ami.bio}</p>
@@ -79,10 +94,18 @@ export default function ProfilAmi() {
                     </div>
                 </main>
 
-                <aside className="profil-right">
-                    <div className="card">
-                        <strong>Suggestion</strong>
-                        <ul> </ul>
+                <aside className="profil-right"><div className="card">
+                    <strong>Suggestion</strong>
+                        {!chargementSuggestions && suggestions.length === 0 && (
+                            <div>Aucune suggestion pour le moment.</div>
+                        )}
+                        <ul>{suggestions.map((s) => (
+                                <li key={s.amiId}>
+                                    {s.prenom} {s.nom}
+
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </aside>
             </div>

@@ -135,6 +135,9 @@ ORDER BY ada.suggestion_id ASC LIMIT 15
             @Param("myId") Long myId,
             @Param("amiId") Long amiId
     );
+//    @Query(value = """
+//UPDATE demandeami SET statutdemande="EN_ATTENTE" WHERE idemetteur=:amiId or idrecepteur=:amiId
+//""")
 
 
     }
