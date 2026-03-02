@@ -1,6 +1,7 @@
 package Reseau.back.controllers;
 
 import Reseau.back.Counters.*;
+import Reseau.back.models.MyUpec.DemandeAmi;
 import Reseau.back.models.MyUpec.Utilisateur;
 import Reseau.back.services.MyUpec.AmisRecommandeesService;
 import Reseau.back.services.MyUpec.DemandeAmiService;
@@ -49,6 +50,11 @@ private AmisRecommandeesService amisRecommandeesService;
             @RequestParam Long myId) {
         return ResponseEntity.ok(amisRecommandeesService.recommanderAmis(myId,id));
     }
-
+    @PostMapping("/envoyer")
+    public ResponseEntity<String> envoyerDemande(
+            @RequestParam Long myId,
+            @RequestParam Long amiId) {
+        service.envoyerDemandeAmi(myId, amiId);
+        return ResponseEntity.ok("Demande d'ami envoyée avec succès");}
 
 }

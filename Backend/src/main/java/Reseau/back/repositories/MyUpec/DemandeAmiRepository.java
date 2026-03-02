@@ -3,6 +3,7 @@ package Reseau.back.repositories.MyUpec;
 import Reseau.back.Counters.*;
 import Reseau.back.models.MyUpec.DemandeAmi;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -136,10 +137,19 @@ ORDER BY ada.suggestion_id ASC LIMIT 15
             @Param("myId") Long myId,
             @Param("amiId") Long amiId
     );
+
 //    @Query(value = """
 //UPDATE demandeami SET statutdemande="EN_ATTENTE" WHERE idemetteur=:amiId or idrecepteur=:amiId
 //""")
-
-
+//
+@Modifying
+@Query(value = """
+INSERT INTO demandeami (dateenvoi, datereponse, statutdemande, idemetteur, idrecepteur)
+VALUES (CURRENT_DATE, CURRENT_DATE, 'EN_ATTENTE', :myId, :amiId)
+    """, nativeQuery = true)
+void envoyerDemandeAmi(
+        @Param("myId") Long myId,
+        @Param("amiId") Long amiId
+);
     }
 
