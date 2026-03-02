@@ -327,7 +327,7 @@ export default function Messagerie() {
                     <div className="d-flex justify-content-between align-items-center p-2">
                         <h5 className="m-0">Messagerie</h5>
 
-                        {/* ✅ icône petite (CSS refreshIconBtn) */}
+                        {}
                         <button
                             type="button"
                             className="refreshIconBtn"
@@ -412,7 +412,7 @@ export default function Messagerie() {
                         </div>
                     ) : (
                         <>
-                            {/* header thread */}
+                            {}
                             <div className="p-2 border-bottom bg-white">
                                 <div className="fw-semibold">
                                     {activeOther
