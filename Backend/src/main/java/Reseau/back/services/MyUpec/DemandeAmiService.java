@@ -68,12 +68,15 @@ public List<AffichageAmis> affichageAmis(Long idUser) {
     @Transactional
     public void envoyerDemandeAmi(Long myId, Long amiId) {
         demandeAmiRepository.envoyerDemandeAmi(myId, amiId);
-        if (myId.equals(amiId)) {
-            throw new RuntimeException(" demande à vous-même");
-        }
 }
 
-
+    @Transactional
+    public void accepterDemandeAmi(Long myId, Long amiId) {
+    int lignesModifiees = demandeAmiRepository.accepterDemandeAmi(myId, amiId);
+        if (lignesModifiees == 0) {
+            throw new RuntimeException("La demande n'a pas pu être acceptée");
+        }
+    }
 
 
 
