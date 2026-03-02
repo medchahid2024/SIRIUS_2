@@ -7,6 +7,9 @@ import Home from "./Home";
 import Statistiques from "./Statistiques";
 import Publication from "./Publication";
 import Messagerie from "./Messagerie";
+import ProfilAmi from "./ProfilAmi";
+
+
 
 export default function Router() {
     return (
@@ -26,6 +29,7 @@ export default function Router() {
                                     <Route path="/Publication" element={<Publication />} />
                                     <Route path="/Statistiques/:id" element={<Statistiques />} />
                                     <Route path="/Messagerie" element={<Messagerie />} />
+                                    <Route path="/ProfilAmi" element={<ProfilAmi />} />
                                 </Routes>
                             </>
                         }

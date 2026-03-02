@@ -5,5 +5,10 @@ public interface AffichageAmis {
     String getNom();
     String getPrenom();
     String getPhoto();
+    String getBio();
+    String getCentresinteret();
+    String getEtablissement();
+    String getNationalite();
+    String getVille();
 
 }

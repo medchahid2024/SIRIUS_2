@@ -1,11 +1,9 @@
 package Reseau.back.repositories.MyUpec;
 
-import Reseau.back.Counters.AffichageAmis;
-import Reseau.back.Counters.NationaliteCountView;
-import Reseau.back.Counters.SexeCountsView;
-import Reseau.back.Counters.AfficheBestAmis;
+import Reseau.back.Counters.*;
 import Reseau.back.models.MyUpec.DemandeAmi;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -59,7 +57,11 @@ SELECT
   u.idutilisateur AS idutilisateur,
   u.nom AS nom,
   u.prenom AS prenom,
-  p.photoprofil AS photo
+  p.photoprofil AS photo,
+  p.centresinteret AS centresinteret,
+  p.etablissement AS etablissement,
+  p.nationalite AS nationalite,
+  p.ville AS ville
 FROM demandeami d
 JOIN utilisateur u
   ON u.idutilisateur = CASE
@@ -104,4 +106,54 @@ ORDER BY nb_jaime_sur_mes_publications DESC LIMIT 10;
 """,nativeQuery = true)
 List<AfficheBestAmis> AffichageMeilleureAmis(@Param("myId") Long idUser);
 
-}
+
+
+
+    @Query(value = """
+WITH amis_de_mon_ami AS (
+SELECT DISTINCT
+    CASE
+     WHEN da.idemetteur = :amiId THEN da.idrecepteur
+      ELSE da.idemetteur
+     END AS suggestion_id
+    FROM demandeami da
+    WHERE (da.idemetteur = :amiId OR da.idrecepteur = :amiId)
+      AND da.statutdemande = 'ACCEPTEE'
+)
+
+SELECT
+    ada.suggestion_id  AS amiId,
+    pr.etablissement    AS etablissement,
+    pr.nationalite      AS nationalite,
+    pr.photoprofil         AS photo,
+  u.nom AS nom,
+u.prenom AS prenom
+FROM amis_de_mon_ami ada
+JOIN profil pr ON pr.idutilisateur = ada.suggestion_id JOIN utilisateur u ON u.idutilisateur = pr.idutilisateur
+WHERE ada.suggestion_id != :myId
+ORDER BY ada.suggestion_id ASC LIMIT 15
+""", nativeQuery = true)
+    List<AmisRecommandees> affichageAmisRecommandees(
+            @Param("myId") Long myId,
+            @Param("amiId") Long amiId
+    );
+
+    @Modifying
+    @Query(value = """
+UPDATE demandeami SET statutdemande='ACCEPTEE' WHERE idemetteur=:amiId 
+AND idrecepteur=:myId AND statutdemande = 'EN_ATTENTE'                                                            
+""", nativeQuery = true)
+    int accepterDemandeAmi(@Param("myId") Long myId, @Param("amiId") Long amiId);
+
+
+@Modifying
+@Query(value = """
+INSERT INTO demandeami (dateenvoi, datereponse, statutdemande, idemetteur, idrecepteur)
+VALUES (CURRENT_DATE, CURRENT_DATE, 'EN_ATTENTE', :myId, :amiId)
+    """, nativeQuery = true)
+void envoyerDemandeAmi(
+        @Param("myId") Long myId,
+        @Param("amiId") Long amiId
+);
+    }
+
