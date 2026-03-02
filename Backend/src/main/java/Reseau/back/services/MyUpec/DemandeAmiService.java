@@ -1,14 +1,18 @@
 package Reseau.back.services.MyUpec;
 
-import Reseau.back.Counters.AffichageAmis;
-import Reseau.back.Counters.AfficheBestAmis;
+import Reseau.back.Counters.*;
+import Reseau.back.models.MyUpec.DemandeAmi;
+import Reseau.back.models.MyUpec.StatutDemande;
+import Reseau.back.models.MyUpec.Utilisateur;
 import Reseau.back.repositories.MyUpec.DemandeAmiRepository;
-import Reseau.back.Counters.NationaliteCountView;
-import Reseau.back.Counters.SexeCountsView;
+import Reseau.back.repositories.MyUpec.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -16,7 +20,8 @@ public class DemandeAmiService {
 
     @Autowired
     private DemandeAmiRepository demandeAmiRepository;
-
+    @Autowired
+    private UtilisateurRepository utilisateurRepository;
 
 public List<AffichageAmis> affichageAmis(Long idUser) {
     return demandeAmiRepository.afficheMesAmis(idUser);
@@ -57,7 +62,31 @@ public List<AffichageAmis> affichageAmis(Long idUser) {
 
 
     public List<NationaliteCountView> countNationaliteAmisAcceptes(Long idUser) {
-        return demandeAmiRepository.countAmisParNationalite(idUser);
+    return demandeAmiRepository.countAmisParNationalite(idUser);
     }
 
+    @Transactional
+    public void envoyerDemandeAmi(Long myId, Long amiId) {
+        demandeAmiRepository.envoyerDemandeAmi(myId, amiId);
+}
+
+    @Transactional
+    public void accepterDemandeAmi(Long myId, Long amiId) {
+    int lignesModifiees = demandeAmiRepository.accepterDemandeAmi(myId, amiId);
+        if (lignesModifiees == 0) {
+            throw new RuntimeException("La demande n'a pas pu être acceptée");
+        }
+    }
+
+
+
+
+
+
+//    public List<AmisRecommandees> getSuggestions(Long myId, Long amiId) {
+//        if (myId.equals(amiId)) {
+//            throw new IllegalArgumentException("Impossible d'afficher la liste recommandee de cet ami.");
+//        }
+//        return demandeAmiRepository.affichageAmisRecommandees(myId, amiId);
+   // }
 }
