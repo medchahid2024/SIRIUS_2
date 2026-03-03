@@ -64,3 +64,7 @@ export function envoyerDemandeAmi(myId, amiId) {
 }
 export function getStatutRelation(myId, amiId) {
     return api.get("/MyUpec/ami/statut", {params: { myId, amiId },}).then((r) => r.data); }
+
+export function accepterDemandeAmi(myId, amiId) {
+    return api.post("/MyUpec/ami/accepter", null, { params: { myId, amiId } }).then((r) => r.data);
+}

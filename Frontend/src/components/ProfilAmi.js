@@ -3,30 +3,39 @@ import React, { useEffect, useState } from "react";
 import "../styles/ProfilAmi.css";
 import "../styles/Profil.css";
 
-import { envoyerDemandeAmi, getProfil, getSuggestionAmi, getStatutRelation } from "../API/api";
+import { envoyerDemandeAmi, accepterDemandeAmi, getProfil, getSuggestionAmi, getStatutRelation } from "../API/api";
 
 export default function ProfilAmi() {
     const [searchParams] = useSearchParams();
     const [ami, setAmi] = useState(null);
     const [chargement, setChargement] = useState(true);
-
     const [suggestions, setSuggestions] = useState([]);
     const [chargementSuggestions, setChargementSuggestions] = useState(false);
 
     const user = localStorage.getItem("user");
     const myId = JSON.parse(user || "null")?.idUtilisateur;
 
-    const [demandeEnvoyee, setDemandeEnvoyee] = useState(false);
-    const [envoiEnCours, setEnvoiEnCours] = useState(false);
     const [statut, setStatut] = useState("AUCUNE");
 
     const idAmi = searchParams.get("to");
 
     useEffect(() => {
         if (!idAmi || !myId) return;
-        getStatutRelation(myId, idAmi)
-            .then((s) => setStatut(s))
-            .catch(() => setStatut("AUCUNE"));
+        getStatutRelation(myId, idAmi).then((monStatut) => {
+            if (monStatut === "EN_ATTENTE") {
+                setStatut("ENVOYE");
+            } else if (monStatut === "ACCEPTEE") {
+                setStatut("AMIS");
+            } else {
+                getStatutRelation(idAmi, myId).then((sonStatut) => {
+                    if (sonStatut === "EN_ATTENTE") {
+                        setStatut("RECU");
+                    } else {
+                        setStatut("AUCUNE");
+                    }
+                });
+            }
+        });
     }, [idAmi, myId]);
 
     useEffect(() => {
@@ -34,52 +43,63 @@ export default function ProfilAmi() {
             setChargement(false);
             return;
         }
-
         getProfil(idAmi)
             .then((data) => {
                 setAmi(data);
                 setChargement(false);
             })
-            .catch(() => {
-                setChargement(false);
-            });
+            .catch(() => setChargement(false));
     }, [idAmi]);
 
     useEffect(() => {
         if (!idAmi || !myId) return;
-
         setChargementSuggestions(true);
         getSuggestionAmi(myId, idAmi)
             .then((data) => setSuggestions(data))
             .finally(() => setChargementSuggestions(false));
     }, [idAmi, myId]);
 
-
-    const AjouterAmi = () => {
-        if (!myId || !idAmi) return;
-
-        setEnvoiEnCours(true);
-
+    const envoyerDemande = () => {
+        if (!myId || !idAmi || statut !== "AUCUNE") return;
+        setStatut("ENVOI");
         envoyerDemandeAmi(myId, idAmi)
-            .then((message) => {
-                console.log(message);
-                setDemandeEnvoyee(true);
-            })
+            .then(() => setStatut("ENVOYE"))
             .catch((err) => {
-                console.error("Erreur:", err);
                 alert(err.response?.data || "Erreur lors de l'envoi");
-            })
-            .finally(() => setEnvoiEnCours(false));
+                setStatut("AUCUNE");
+            });
     };
 
-    if (!ami && !chargement) {
-        return (
-            <div className="profil-page">
-                <p>Profil introuvable</p>
-                <Link to="/Profil">Retour à mon profil</Link>
-            </div>
-        );
-    }
+    const accepterDemande = () => {
+        if (!myId || !idAmi || statut !== "RECU") return;
+        setStatut("ACCEPTATION");
+        accepterDemandeAmi(myId, idAmi)
+            .then(() => setStatut("AMIS"))
+            .catch((err) => {
+                alert(err.response?.data || "Erreur lors de l'acceptation");
+                setStatut("RECU");
+            });
+    };
+
+    const getBouton = () => {
+        switch (statut) {case "ENVOI":
+                return { texte: "Envoi...", disabled: true, classe: "btn-outline-light" };
+            case "ENVOYE":
+                return { texte: "Demande envoyée", disabled: true, classe: "btn-secondary" };
+            case "RECU":
+                return { texte: "Accepter", disabled: false, classe: "btn-success", onClick: accepterDemande };
+            case "ACCEPTATION":
+                return { texte: "Acceptation...", disabled: true, classe: "btn-outline-light" };
+            case "AMIS":
+                return { texte: "Ami", disabled: true, classe: "btn-success" };
+            case "REFUSEE":
+                return { texte: "Demande refusée", disabled: true, classe: "btn-danger" };
+            default:
+                return { texte: "Ajouter", disabled: false, classe: "btn-outline-light", onClick: envoyerDemande };
+        }
+    };
+
+    const bouton = getBouton();
 
     if (chargement) {
         return (
@@ -88,6 +108,16 @@ export default function ProfilAmi() {
             </div>
         );
     }
+
+    if (!ami) {
+        return (
+            <div className="profil-page">
+                <p>Profil introuvable</p>
+                <Link to="/Profil">Retour à mon profil</Link>
+            </div>
+        );
+    }
+
     return (
         <div className="profil-page">
             <div className="profil-banner"></div>
@@ -102,26 +132,17 @@ export default function ProfilAmi() {
                 <p className="profil-location">{ami.ville}</p>
 
                 <div style={{ display: "flex", gap: "50px" }}>
-                    <Link
-                        to={`/Messagerie?to=${idAmi}`}
-                        className="btn btn-outline-danger"
-                    >
+                    <Link to={`/Messagerie?to=${idAmi}`} className="btn btn-outline-danger">
                         Envoyer un message
                     </Link>
 
                     <button
                         type="button"
-                        className="btn-outline-light"
-                        onClick={AjouterAmi}
-                        disabled={envoiEnCours || demandeEnvoyee || statut === "EN_ATTENTE" || statut === "ACCEPTEE"}
+                        className={bouton.classe}
+                        onClick={bouton.onClick}
+                        disabled={bouton.disabled}
                     >
-                        <strong>
-                            {envoiEnCours ? "Envoi..."
-                                : demandeEnvoyee || statut === "EN_ATTENTE" ? "Demande envoyée"
-                                    : statut === "ACCEPTEE" ? "Ami"
-                                        : statut === "REFUSEE" ? "Demande refusée"
-                                            : "Ajouter"}
-                        </strong>
+                        <strong>{bouton.texte}</strong>
                     </button>
                 </div>
             </div>
@@ -161,7 +182,6 @@ export default function ProfilAmi() {
                                             <img src={s.photo} alt={`${s.prenom} ${s.nom}`} />
                                             <span>{s.prenom} {s.nom}</span>
                                         </Link>
-                                        <br />
                                     </div>
                                     <button className="btn btn-sm btn-outline-danger">
                                         Ajouter
