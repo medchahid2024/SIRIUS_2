@@ -156,11 +156,13 @@ void envoyerDemandeAmi(
         @Param("amiId") Long amiId
 );
     @Query(value = """
-    SELECT EXISTS(
-        SELECT 1 FROM demandeami 
-        WHERE (idemetteur = :id1 AND idrecepteur = :id2 AND statutdemande = 'EN_ATTENTE')
-           OR (idemetteur = :id2 AND idrecepteur = :id1 AND statutdemande = 'EN_ATTENTE')
+    SELECT COALESCE(
+        (SELECT da.statutdemande 
+         FROM demandeami da 
+         WHERE (da.idemetteur = :id1 AND da.idrecepteur = :id2)
+            OR (da.idemetteur = :id2 AND da.idrecepteur = :id1)
+         LIMIT 1),
+        'AUCUNE'
     )
     """, nativeQuery = true)
-    boolean demandeEnAttenteExiste(@Param("id1") Long id1, @Param("id2") Long id2);}
-
+    String getStatutRelation(@Param("id1") Long id1, @Param("id2") Long id2);}

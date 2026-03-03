@@ -58,10 +58,9 @@ public List<AffichageAmis> affichageAmis(Long idUser) {
 
     }
 
-    public boolean demandeExiste(Long id1, Long id2) {
-        return demandeAmiRepository.demandeEnAttenteExiste(id1, id2);
+    public String getStatutRelation(Long id1, Long id2) {
+        return demandeAmiRepository.getStatutRelation(id1, id2);
     }
-
 
     public List<NationaliteCountView> countNationaliteAmisAcceptes(Long idUser) {
     return demandeAmiRepository.countAmisParNationalite(idUser);

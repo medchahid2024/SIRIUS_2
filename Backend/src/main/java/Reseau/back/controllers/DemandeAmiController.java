@@ -80,12 +80,12 @@ public class DemandeAmiController {
         }
     }
 
-    @GetMapping("/existe")
-    public ResponseEntity<Boolean> demandeExiste(
-            @RequestParam Long id1,
-            @RequestParam Long id2) {
+    @GetMapping("/statut")
+    public ResponseEntity<String> demandeExiste(
+            @RequestParam Long myId,
+            @RequestParam Long amiId) {
 
-        boolean existe = service.demandeExiste(id1, id2);
-        return ResponseEntity.ok(existe);
+        String statut  = service.getStatutRelation(myId, amiId);
+        return ResponseEntity.ok(statut);
     }
 }

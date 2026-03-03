@@ -32,28 +32,38 @@ public class AmisRecommandeesService {
         List<AmisRecommandees> suggestions = demandeAmiRepository.affichageAmisRecommandees(myId, amiId);
 
         List<RecommandationResultat> resultats = new ArrayList<>();
+        System.out.println("===========================================================");
+        System.out.println("               CALCUL DES SCORES DE RECOMMANDATION         ");
+        System.out.println("===========================================================");
 
         System.out.println("-----------------------------------------------------------");
-        System.out.println("Bareme :"+ "10 points meme etablissement  5 point si meme nantionalite  1 point pour chaque interaction");
-        System.out.println("Utilisateur :"+myId);
+        System.out.println("Bareme :"+ "10 points meme etablissement  5 point si meme nantionalite ");
+        System.out.println("Utilisateur connecté :"+myId);
 
 
         for (AmisRecommandees suggestion: suggestions) {
             int score = 0;
-
+            System.out.println("monEtab  :" + monEtab+ " ------------- "+"Etablissement de mon amis :"+suggestion.getEtablissement());
+            System.out.println("maNat :" + maNat + " ----------------- " + "Nationalite de mon amis :" + suggestion.getNationalite());
             if (monEtab != null && suggestion.getEtablissement() != null
                     && monEtab.equalsIgnoreCase(suggestion.getEtablissement())) {
                 score += 10;
+                System.out.println(" Même établissement -- +10 points");
             }
-
+            else {
+                System.out.println("Etablissement différent -- +0 point");
+            }
             if (maNat != null && suggestion.getNationalite() != null
                     && maNat.equalsIgnoreCase(suggestion.getNationalite())) {
                 score += 5;
+                System.out.println(" Même nationalité -- +5 points");
+
+            }
+            else {
+                System.out.println(" Nationalité différente -- +0 point");
             }
 
 
-            System.out.println("monEtab  :" + monEtab+ " ------------- "+"Etablissement de mon amis :"+suggestion.getEtablissement());
-            System.out.println("maNat :" + maNat + " ----------------- " + "Nationalite de mon amis :" + suggestion.getNationalite());
 
             System.out.println("------ Score  :"+ score);
 

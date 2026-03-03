@@ -3,9 +3,7 @@ import React, { useEffect, useState } from "react";
 import "../styles/ProfilAmi.css";
 import "../styles/Profil.css";
 
-import {envoyerDemandeAmi, getProfil, getSuggestionAmi} from "../API/api";
-
-
+import { envoyerDemandeAmi, getProfil, getSuggestionAmi, getStatutRelation } from "../API/api";
 
 export default function ProfilAmi() {
     const [searchParams] = useSearchParams();
@@ -20,9 +18,16 @@ export default function ProfilAmi() {
 
     const [demandeEnvoyee, setDemandeEnvoyee] = useState(false);
     const [envoiEnCours, setEnvoiEnCours] = useState(false);
+    const [statut, setStatut] = useState("AUCUNE");
 
     const idAmi = searchParams.get("to");
 
+    useEffect(() => {
+        if (!idAmi || !myId) return;
+        getStatutRelation(myId, idAmi)
+            .then((s) => setStatut(s))
+            .catch(() => setStatut("AUCUNE"));
+    }, [idAmi, myId]);
 
     useEffect(() => {
         if (!idAmi) {
@@ -31,18 +36,22 @@ export default function ProfilAmi() {
         }
 
         getProfil(idAmi)
-            .then((data) => {setAmi(data);
+            .then((data) => {
+                setAmi(data);
                 setChargement(false);
             })
             .catch(() => {
                 setChargement(false);
-            });}, [idAmi]);
+            });
+    }, [idAmi]);
+
     useEffect(() => {
         if (!idAmi || !myId) return;
 
         setChargementSuggestions(true);
-        getSuggestionAmi(myId, idAmi).then((data) => {setSuggestions(data);
-        }).finally(() => setChargementSuggestions(false));
+        getSuggestionAmi(myId, idAmi)
+            .then((data) => setSuggestions(data))
+            .finally(() => setChargementSuggestions(false));
     }, [idAmi, myId]);
 
 
@@ -50,9 +59,12 @@ export default function ProfilAmi() {
         if (!myId || !idAmi) return;
 
         setEnvoiEnCours(true);
-        envoyerDemandeAmi(myId, idAmi).then((message) => {console.log(message);
-            setDemandeEnvoyee(true);
-        })
+
+        envoyerDemandeAmi(myId, idAmi)
+            .then((message) => {
+                console.log(message);
+                setDemandeEnvoyee(true);
+            })
             .catch((err) => {
                 console.error("Erreur:", err);
                 alert(err.response?.data || "Erreur lors de l'envoi");
@@ -60,8 +72,7 @@ export default function ProfilAmi() {
             .finally(() => setEnvoiEnCours(false));
     };
 
-
-    if (!ami) {
+    if (!ami && !chargement) {
         return (
             <div className="profil-page">
                 <p>Profil introuvable</p>
@@ -69,14 +80,14 @@ export default function ProfilAmi() {
             </div>
         );
     }
+
     if (chargement) {
         return (
             <div className="profil-page">
-                <p>Chargement</p>
+                <p>Chargement...</p>
             </div>
         );
     }
-
     return (
         <div className="profil-page">
             <div className="profil-banner"></div>
@@ -85,11 +96,12 @@ export default function ProfilAmi() {
                 <img
                     src={ami.photoProfil}
                     alt={`${ami.utilisateur.nom} ${ami.utilisateur.prenom}`}
-                    style={{width: 100, height: 100, borderRadius: "50%"}}
+                    style={{ width: 100, height: 100, borderRadius: "50%" }}
                 />
                 <h2>{ami.utilisateur.nom} {ami.utilisateur.prenom}</h2>
                 <p className="profil-location">{ami.ville}</p>
-                <div style={{display: "flex", gap: "50px"}}>
+
+                <div style={{ display: "flex", gap: "50px" }}>
                     <Link
                         to={`/Messagerie?to=${idAmi}`}
                         className="btn btn-outline-danger"
@@ -101,19 +113,17 @@ export default function ProfilAmi() {
                         type="button"
                         className="btn-outline-light"
                         onClick={AjouterAmi}
-                        disabled={envoiEnCours || demandeEnvoyee}
+                        disabled={envoiEnCours || demandeEnvoyee || statut === "EN_ATTENTE" || statut === "ACCEPTEE"}
                     >
                         <strong>
-                            {envoiEnCours
-                                ? "Envoi..."
-                                : demandeEnvoyee
-                                    ? "Demande envoyée"
-                                    : "Ajouter"}
+                            {envoiEnCours ? "Envoi..."
+                                : demandeEnvoyee || statut === "EN_ATTENTE" ? "Demande envoyée"
+                                    : statut === "ACCEPTEE" ? "Ami"
+                                        : statut === "REFUSEE" ? "Demande refusée"
+                                            : "Ajouter"}
                         </strong>
                     </button>
-
                 </div>
-
             </div>
 
             <div className="profil-layout">
@@ -144,21 +154,15 @@ export default function ProfilAmi() {
                         )}
 
                         <ul>
-
                             {suggestions.map((s) => (
                                 <li key={s.amiId} className="ProfilAmiLi">
                                     <div className="ProfilAmiDiv">
-                                        <Link
-                                            to={`/ProfilAmi?to=${s.amiId}`}
-                                        >
-
-                                            <img src={s.photo} alt={`${s.prenom} ${s.nom}`}/>
+                                        <Link to={`/ProfilAmi?to=${s.amiId}`}>
+                                            <img src={s.photo} alt={`${s.prenom} ${s.nom}`} />
                                             <span>{s.prenom} {s.nom}</span>
                                         </Link>
-                                        <br/>
+                                        <br />
                                     </div>
-
-
                                     <button className="btn btn-sm btn-outline-danger">
                                         Ajouter
                                     </button>
