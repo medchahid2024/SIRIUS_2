@@ -103,7 +103,7 @@ private List<PublicationRecoDTO> getPersonalRecommendations(Long userId, int off
 
             double bonusRecence = 1/(1+ageHours);
 
-            double finalScore = scoreTag + bonusRecence;
+            double finalScore = scoreTag*0.8 + bonusRecence*20;
 
             scored.add(new Scored(p,finalScore,ageHours));
         }
