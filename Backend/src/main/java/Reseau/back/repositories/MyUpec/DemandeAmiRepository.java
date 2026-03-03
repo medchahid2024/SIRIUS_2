@@ -155,5 +155,12 @@ void envoyerDemandeAmi(
         @Param("myId") Long myId,
         @Param("amiId") Long amiId
 );
-    }
+    @Query(value = """
+    SELECT EXISTS(
+        SELECT 1 FROM demandeami 
+        WHERE (idemetteur = :id1 AND idrecepteur = :id2 AND statutdemande = 'EN_ATTENTE')
+           OR (idemetteur = :id2 AND idrecepteur = :id1 AND statutdemande = 'EN_ATTENTE')
+    )
+    """, nativeQuery = true)
+    boolean demandeEnAttenteExiste(@Param("id1") Long id1, @Param("id2") Long id2);}
 

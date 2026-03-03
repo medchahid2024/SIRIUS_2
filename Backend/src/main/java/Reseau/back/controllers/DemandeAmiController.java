@@ -79,4 +79,13 @@ public class DemandeAmiController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/existe")
+    public ResponseEntity<Boolean> demandeExiste(
+            @RequestParam Long id1,
+            @RequestParam Long id2) {
+
+        boolean existe = service.demandeExiste(id1, id2);
+        return ResponseEntity.ok(existe);
+    }
 }

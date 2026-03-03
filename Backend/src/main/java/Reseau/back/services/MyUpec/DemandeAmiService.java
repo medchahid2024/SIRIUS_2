@@ -58,7 +58,9 @@ public List<AffichageAmis> affichageAmis(Long idUser) {
 
     }
 
-
+    public boolean demandeExiste(Long id1, Long id2) {
+        return demandeAmiRepository.demandeEnAttenteExiste(id1, id2);
+    }
 
 
     public List<NationaliteCountView> countNationaliteAmisAcceptes(Long idUser) {
@@ -76,6 +78,11 @@ public List<AffichageAmis> affichageAmis(Long idUser) {
         if (lignesModifiees == 0) {
             throw new RuntimeException("La demande n'a pas pu être acceptée");
         }
+
+
+
+
+
     }
 
 
