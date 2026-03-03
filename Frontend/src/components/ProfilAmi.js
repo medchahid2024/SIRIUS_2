@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import "../styles/ProfilAmi.css";
 import "../styles/Profil.css";
 
-import { getProfil,getSuggestionAmi } from "../API/api";
+import {envoyerDemandeAmi, getProfil, getSuggestionAmi} from "../API/api";
 
 
 
@@ -18,7 +18,11 @@ export default function ProfilAmi() {
     const user = localStorage.getItem("user");
     const myId = JSON.parse(user || "null")?.idUtilisateur;
 
+    const [demandeEnvoyee, setDemandeEnvoyee] = useState(false);
+    const [envoiEnCours, setEnvoiEnCours] = useState(false);
+
     const idAmi = searchParams.get("to");
+
 
     useEffect(() => {
         if (!idAmi) {
@@ -40,6 +44,22 @@ export default function ProfilAmi() {
         getSuggestionAmi(myId, idAmi).then((data) => {setSuggestions(data);
             }).finally(() => setChargementSuggestions(false));
     }, [idAmi, myId]);
+
+
+    const AjouterAmi = () => {
+        if (!myId || !idAmi) return;
+
+        setEnvoiEnCours(true);
+        envoyerDemandeAmi(myId, idAmi).then((message) => {console.log(message);
+                setDemandeEnvoyee(true);
+            })
+            .catch((err) => {
+                console.error("Erreur:", err);
+                alert(err.response?.data || "Erreur lors de l'envoi");
+            })
+            .finally(() => setEnvoiEnCours(false));
+    };
+
 
     if (!ami) {
         return (
@@ -77,7 +97,20 @@ export default function ProfilAmi() {
                         Envoyer un message
                     </Link>
 
-                    <button  type="button" className="btn-outline-light" > <strong>Ajouter</strong></button>
+                    <button
+                        type="button"
+                        className="btn-outline-light"
+                        onClick={AjouterAmi}
+                        disabled={envoiEnCours || demandeEnvoyee}
+                    >
+                        <strong>
+                            {envoiEnCours
+                                ? "Envoi..."
+                                : demandeEnvoyee
+                                    ? "Demande envoyée"
+                                    : "Ajouter"}
+                        </strong>
+                    </button>
 
                 </div>
 
@@ -115,8 +148,13 @@ export default function ProfilAmi() {
                             {suggestions.map((s) => (
                                 <li key={s.amiId} className="ProfilAmiLi">
                                     <div className="ProfilAmiDiv">
+                                        <Link
+                                            to={`/ProfilAmi?to=${s.amiId}`}
+                                        >
+
                                         <img src={s.photo} alt={`${s.prenom} ${s.nom}`}/>
                                         <span>{s.prenom} {s.nom}</span>
+                                        </Link>
                                         <br/>
                                     </div>
 
