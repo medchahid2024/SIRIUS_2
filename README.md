@@ -6,16 +6,41 @@
 ||   ||   ||
 ||    ||  ||||||||
 
-test
-test 2
-test 3
-test 4
-test 5
+
+
+------------------------------"USE Case  2: Recommander des profils----------------------------------------------------
+WI1: Script de peuplement PostgreSQL pour      
+utilisateurs,profil, amis, publications 
+et interactions.
+WI:2 Section recommandés Index	
+WI:3 profils recommandés
+WI4: Algo recommandation
+WI5: Ajouter en ami
+WI6: Accepter amitié
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-
 
 
 
       Wi                                         |  Categorie | Statut | Description
-WI1  Envoyer un message te                       |  GUI       | OK     |Depuis la fiche d’un utilisateur ou la liste d’amis, je clique sur Nouveau message et une nouvelle conversation vide s’ouvre avec ce contact
+WI1 Script de peuplement PostgreSQL pour 
+utilisateurs ,profil, amis, publications     
+et interactions.          |  GUI       | OK     |Depuis la fiche d’un utilisateur ou la liste d’amis, je clique sur Nouveau message et une nouvelle conversation vide s’ouvre avec ce contact
 WI2  Création conversation backend               |  API+GUI   | OK     |Au clic sur « Nouveau message », une entrée est créée dans la table Conversation avec les deux participants, visible ensuite dans la base
 WI3  Affichage dans la liste de conversations    |  GUI       | OK     | Quand la conversation est créée, elle apparaît en haut de ma boîte de réception avec le nom (photo facultatif) de l’autre utilisateur
 WI4  Envoyer un message texte                    |  GUI       | OK     |Dans une conversation ouverte, je tape un message et je clique sur « Envoyer » , le message apparaît dans le fil
