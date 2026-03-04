@@ -79,4 +79,13 @@ public class DemandeAmiController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/statut")
+    public ResponseEntity<String> demandeExiste(
+            @RequestParam Long myId,
+            @RequestParam Long amiId) {
+
+        String statut  = service.getStatutRelation(myId, amiId);
+        return ResponseEntity.ok(statut);
+    }
 }

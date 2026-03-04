@@ -58,8 +58,9 @@ public List<AffichageAmis> affichageAmis(Long idUser) {
 
     }
 
-
-
+    public String getStatutRelation(Long id1, Long id2) {
+        return demandeAmiRepository.getStatutRelation(id1, id2);
+    }
 
     public List<NationaliteCountView> countNationaliteAmisAcceptes(Long idUser) {
     return demandeAmiRepository.countAmisParNationalite(idUser);
@@ -76,6 +77,11 @@ public List<AffichageAmis> affichageAmis(Long idUser) {
         if (lignesModifiees == 0) {
             throw new RuntimeException("La demande n'a pas pu être acceptée");
         }
+
+
+
+
+
     }
 
 

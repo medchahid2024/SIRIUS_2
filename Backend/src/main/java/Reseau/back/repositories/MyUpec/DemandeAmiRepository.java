@@ -155,5 +155,14 @@ void envoyerDemandeAmi(
         @Param("myId") Long myId,
         @Param("amiId") Long amiId
 );
-    }
-
+    @Query(value = """
+    SELECT COALESCE(
+        (SELECT da.statutdemande 
+         FROM demandeami da 
+         WHERE (da.idemetteur = :id1 AND da.idrecepteur = :id2)
+            OR (da.idemetteur = :id2 AND da.idrecepteur = :id1)
+         LIMIT 1),
+        'AUCUNE'
+    )
+    """, nativeQuery = true)
+    String getStatutRelation(@Param("id1") Long id1, @Param("id2") Long id2);}
