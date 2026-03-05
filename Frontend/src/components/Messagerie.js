@@ -18,9 +18,11 @@ export default function Messagerie() {
     const [searchParams, setSearchParams] = useSearchParams();
     const toParam = searchParams.get("to");
     const inboxParam = searchParams.get("inbox");
-    const tParam = searchParams.get("t"); // pour forcer un "refresh" à chaque click navbar
+    const tParam = searchParams.get("t");
 
     const [user, setUser] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
+
 
     const [conversations, setConversations] = useState([]);
     const [activeConv, setActiveConv] = useState(null);
@@ -327,80 +329,72 @@ export default function Messagerie() {
                     <div className="d-flex justify-content-between align-items-center p-2">
                         <h5 className="m-0">Messagerie</h5>
 
-                        {}
-                        <button
-                            type="button"
-                            className="refreshIconBtn"
-                            title="Rafraîchir"
-                            aria-label="Rafraîchir"
-                            onClick={manualRefresh}
-                        >
-                            ⟳
-                        </button>
+                        <div className="d-flex gap-1">
+                            <input
+                                type="text"
+                                placeholder="Rechercher un profil"
+                                className="form-control form-control-sm"
+                                style={{ width: "200px" }}
+                                value={searchTerm || ''}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+
+                            <button
+                                type="button"
+                                className="refreshIconBtn btn btn-outline-secondary btn-sm p-1"
+                                title="Actualiser la liste"
+                                onClick={manualRefresh}
+                            >
+                                ⟳
+                            </button>
+                        </div>
                     </div>
+
 
                     <div className="list-group list-group-flush">
                         {conversations.length === 0 ? (
-                            <div className="p-3 text-muted">Aucune conversation.</div>
+                            <div className="p-3 text-muted">Pas encore de conversations</div>
                         ) : (
-                            conversations.map((c) => {
-                                const other = c.other;
-                                const isOnline = other?.idUtilisateur
-                                    ? onlineSet.has(other.idUtilisateur)
-                                    : false;
-                                const unread = Number(c.unreadCount || 0);
+                            conversations.map((conv) => {
+                                const autreUser = conv.other;
+                                const online = autreUser?.idUtilisateur && onlineSet.has(autreUser.idUtilisateur);
+                                const nonLus = Number(conv.unreadCount || 0);
 
                                 return (
                                     <button
-                                        key={c.idConversation}
-                                        className={
-                                            "list-group-item list-group-item-action " +
-                                            (activeConv === c.idConversation ? "active" : "")
-                                        }
-                                        onClick={() => openConversation(c.idConversation, c.other)}
+                                        key={conv.idConversation}
+                                        className={`list-group-item list-group-item-action ${activeConv === conv.idConversation ? 'active' : ''}`}
+                                        onClick={() => openConversation(conv.idConversation, conv.other)}
                                     >
-                                        <div className="d-flex align-items-center gap-2">
-                                            <div className="fw-semibold">
-                                                {other?.nom} {other?.prenom}
+                                        <div className="d-flex align-items-center">
+                                            <div className="fw-bold me-auto">
+                                                {autreUser?.nom} {autreUser?.prenom}
                                             </div>
 
-                                            {isOnline && (
+                                            {online && (
                                                 <span
                                                     title="En ligne"
-                                                    style={{
-                                                        width: 8,
-                                                        height: 8,
-                                                        borderRadius: 99,
-                                                        background: "#28a745",
-                                                        display: "inline-block",
-                                                    }}
+                                                    className="badge bg-success rounded-pill me-2"
+                                                    style={{width: 10, height: 10}}
                                                 />
                                             )}
 
-                                            {unread > 0 && (
-                                                <span
-                                                    style={{
-                                                        marginLeft: "auto",
-                                                        background: "#dc3545",
-                                                        color: "#fff",
-                                                        borderRadius: 999,
-                                                        padding: "2px 8px",
-                                                        fontSize: 12,
-                                                    }}
-                                                >
-                          {unread}
-                        </span>
+                                            {nonLus > 0 && (
+                                                <span className="badge bg-danger">
+                                {nonLus}
+                            </span>
                                             )}
                                         </div>
 
-                                        <div className="small" style={{opacity: 0.85}}>
-                                            {c?.lastMessage ? c.lastMessage : "(conversation vide)"}
+                                        <div className="small text-muted mt-1">
+                                            {conv.lastMessage || 'Aucun message'}
                                         </div>
                                     </button>
                                 );
                             })
                         )}
                     </div>
+
                 </div>
 
                 {/* RIGHT: thread */}
@@ -469,7 +463,7 @@ export default function Messagerie() {
                                 <div className="d-flex gap-2">
                                     <input
                                         className="form-control"
-                                        placeholder="Écrire un message…"
+                                        placeholder="Écrire un message"
                                         value={text}
                                         onChange={(e) => onChangeText(e.target.value)}
                                         onKeyDown={(e) => e.key === "Enter" && onSend()}
