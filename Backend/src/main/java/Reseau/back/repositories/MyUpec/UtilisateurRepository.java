@@ -18,8 +18,14 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
     @Query(value = "SELECT * FROM Utilisateur WHERE idutilisateur = :id", nativeQuery = true)
     Optional<Utilisateur> findUtilisateurById(@Param("id") Long id);
 
+    /*-------------------------------------------------------------------------------------------------------   */
+    /*-------------------------------------------------------------------------------------------------------   */
+
+    /*------------------------------------Se connecter------------------------------------------   */
+
     @Query(value="SELECT * from  Utilisateur  where  email=:email AND mot_de_passe=:MotDePasse",nativeQuery = true)
     Optional<Utilisateur> findEmailPassword(@Param("email") String email, @Param("MotDePasse") String MotDePasse);
 
-
 }
+/*-------------------------------------------------------------------------------------------------------   */
+/*-------------------------------------------------------------------------------------------------------   */
