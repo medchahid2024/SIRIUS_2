@@ -19,6 +19,13 @@ WI5: Ajouter en ami
 WI6: Accepter amitié
 -----------------------------------------------------------------------------------------------------------------------
 
+------------------------------USE Case  2: Envoyer/Recevoir un message----------------------------------------------------
+
+WI1: Tri automatique par dernier message
+WI2: Recherche / filtrage par nomAffichage notification
+WI3: Ouverture conversation au clic
+WI4: Navigation vers boîte réception
+-----------------------------------------------------------------------------------------------------------------------
 
 
 
