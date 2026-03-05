@@ -70,4 +70,13 @@ Les publications sont triées par ordre décroissant selon leur score de pertine
 US5 - Exposition du fil personnalisé
 Le fil d’actualité affiche en priorité les publications les plus pertinentes pour l’utilisateur, avec chargement progressif (pagination).
 
-Test R2
+R2 - Recommandations basées sur profilage
+
+US1 - Exploiter les informations du profil
+On recupere la liste d'amis de l'utilisateur ainsi que ses centres d'intêrets
+
+US2 - Ajouter au 1er systeme de recommandations une influence des tags des centres d'intêret profil
+
+US3 - Exposition du fil V2
+
+On repartit en 80/20 le % des publications affichées dans le fil par blocs de 10 avec 80% grâce au score des tags des publications avec lesquelles on a precedemment interagi et ceux du profil, en partageant selon les tops tags et 20% selon les publications avec lesquelles nos amis ont interagi.
