@@ -13,6 +13,10 @@ import java.util.List;
 
 @Repository
 public interface DemandeAmiRepository extends JpaRepository<DemandeAmi, Long> {
+/*-------------------------------------------------------------------------------------------------------   */
+    /*-------------------------------------------------------------------------------------------------------   */
+
+    /*------------------------------Compter le pourcentage du sexe pour les amis dutilisateur connecte--------------------------------------------------   */
 
     @Query(value = """
  WITH friends AS (
@@ -33,7 +37,10 @@ SELECT idemetteur AS u, idrecepteur AS ami FROM demandeami
         WHERE f.u = :idUser
         """, nativeQuery = true)
     SexeCountsView countSexeAmisAcceptes(@Param("idUser") Long idUser);
+    /*-------------------------------------------------------------------------------------------------------   */
+    /*-------------------------------------------------------------------------------------------------------   */
 
+    /*---------------------------------------Compter le pourcentage de nationalite pour les amis d l'utilisateur connecte----------------------------------------------------------------   */
 
     @Query(value = """
     SELECT
@@ -51,6 +58,10 @@ SELECT idemetteur AS u, idrecepteur AS ami FROM demandeami
     ORDER BY nb DESC
     """, nativeQuery = true)
     List<NationaliteCountView> countAmisParNationalite(@Param("idUser") Long idUser);
+    /*-------------------------------------------------------------------------------------------------------   */
+    /*-------------------------------------------------------------------------------------------------------   */
+
+    /*-----------------------------------Afficher les amis d'utilisateur ---------------------------------------------------------   */
 
 @Query (value= """
 SELECT
@@ -75,8 +86,11 @@ WHERE d.statutdemande = 'ACCEPTEE'
 ORDER BY u.nom, u.prenom;
 """, nativeQuery = true)
     List<AffichageAmis> afficheMesAmis(@Param("idUser") Long idUser);
+    /*-------------------------------------------------------------------------------------------------------   */
+    /*-------------------------------------------------------------------------------------------------------   */
 
 
+    /*----------------------------------------Calculer le score d'amitié-------------------------------------------------   */
 
 @Query (value = """
 WITH mes_amis AS (
@@ -106,8 +120,11 @@ ORDER BY nb_jaime_sur_mes_publications DESC LIMIT 10;
 """,nativeQuery = true)
 List<AfficheBestAmis> AffichageMeilleureAmis(@Param("myId") Long idUser);
 
+    /*-------------------------------------------------------------------------------------------------------   */
+    /*-------------------------------------------------------------------------------------------------------   */
 
 
+    /*-------------------------------------------Afiichage de suggestions d'ami------------------------------------------------------   */
 
     @Query(value = """
 WITH amis_de_mon_ami AS (
@@ -137,6 +154,10 @@ ORDER BY ada.suggestion_id ASC LIMIT 15
             @Param("myId") Long myId,
             @Param("amiId") Long amiId
     );
+    /*-------------------------------------------------------------------------------------------------------   */
+    /*-------------------------------------------------------------------------------------------------------   */
+
+    /*-------------------------------------Accepter une demande d'amitié------------------------------------------------------   */
 
     @Modifying
     @Query(value = """
@@ -144,9 +165,13 @@ UPDATE demandeami SET statutdemande='ACCEPTEE' WHERE idemetteur=:amiId
 AND idrecepteur=:myId AND statutdemande = 'EN_ATTENTE'                                                            
 """, nativeQuery = true)
     int accepterDemandeAmi(@Param("myId") Long myId, @Param("amiId") Long amiId);
+    /*-------------------------------------------------------------------------------------------------------   */
+    /*-------------------------------------------------------------------------------------------------------   */
+
+    /*---------------------------------ajouter un ami------------------------------------------------------------   */
 
 
-@Modifying
+    @Modifying
 @Query(value = """
 INSERT INTO demandeami (dateenvoi, datereponse, statutdemande, idemetteur, idrecepteur)
 VALUES (CURRENT_DATE, CURRENT_DATE, 'EN_ATTENTE', :myId, :amiId)
@@ -155,5 +180,21 @@ void envoyerDemandeAmi(
         @Param("myId") Long myId,
         @Param("amiId") Long amiId
 );
-    }
+    /*-------------------------------------------------------------------------------------------------------   */
+    /*-------------------------------------------------------------------------------------------------------   */
 
+    /*------------------------------------Afficher le statut de demande-----------------------------------------------   */
+
+    @Query(value = """
+    SELECT COALESCE(
+        (SELECT da.statutdemande 
+         FROM demandeami da 
+         WHERE (da.idemetteur = :id1 AND da.idrecepteur = :id2)
+            OR (da.idemetteur = :id2 AND da.idrecepteur = :id1)
+         LIMIT 1),
+        'AUCUNE'
+    )
+    """, nativeQuery = true)
+    String getStatutRelation(@Param("id1") Long id1, @Param("id2") Long id2);}
+/*-------------------------------------------------------------------------------------------------------   */
+/*-------------------------------------------------------------------------------------------------------   */

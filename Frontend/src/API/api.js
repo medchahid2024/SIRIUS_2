@@ -55,11 +55,22 @@ export function getOnlineUsers() {
 export function getProfil(userId) {
     return api.get(`/MyUpec/profil/monProfil/${userId}`).then((r) => r.data);
 
-
 }
 export function getSuggestionAmi(myId, amiId) {
     return api.get(`/MyUpec/ami/suggestion/${amiId}`, {params: { myId },}).then((r) => r.data);
 }
 export function envoyerDemandeAmi(myId, amiId) {
     return api.post("/MyUpec/ami/envoyer", null, {params: { myId, amiId },}).then((r) => r.data);
+}
+export function getStatutRelation(myId, amiId) {
+    return api.get("/MyUpec/ami/statut", {params: { myId, amiId },}).then((r) => r.data); }
+
+export function accepterDemandeAmi(myId, amiId) {
+    return api.post("/MyUpec/ami/accepter", null, { params: { myId, amiId } }).then((r) => r.data);
+}
+
+export function getFeed(userId, offset = 0, limit = 10) {
+    return api
+        .get(`/api/feed/${userId}`, { params: { offset, limit } })
+        .then((r) => r.data);
 }
