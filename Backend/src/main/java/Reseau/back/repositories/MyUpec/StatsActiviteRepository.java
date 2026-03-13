@@ -20,4 +20,16 @@ SELECT COUNT(*) FROM publication
             @Param("annee") int annee,
             @Param("mois") int mois
     );
+
+    @Query(value = """
+    SELECT COUNT(*) FROM interaction
+        WHERE idutilisateur = :userId
+          AND EXTRACT(YEAR FROM dateinteraction) = :annee
+          AND EXTRACT(MONTH FROM dateinteraction) = :mois
+        """, nativeQuery = true)
+    int countInteractionsMois(
+            @Param("userId") Long userId,
+            @Param("annee") int annee,
+            @Param("mois") int mois
+    );
 }

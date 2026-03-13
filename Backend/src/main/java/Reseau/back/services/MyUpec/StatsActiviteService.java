@@ -12,15 +12,16 @@ public class StatsActiviteService {
 
     public record StatsActivite(
             int nbPublications,
+            int nbInteractions,
             int annee,
             int mois
     ) {}
 
     public StatsActivite getStatsMois(Long userId, int annee, int mois) {
-        return new StatsActivite(
-                statsActiviteRepository.countPublicationsMois(userId, annee, mois),
-                annee,
-                mois
+        return new StatsActivite(statsActiviteRepository.countPublicationsMois(userId, annee, mois),
+                                 statsActiviteRepository.countInteractionsMois(userId, annee, mois),annee,mois
         );
     }
+
+
 }
