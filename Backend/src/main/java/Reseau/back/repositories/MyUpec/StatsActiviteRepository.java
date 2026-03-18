@@ -44,4 +44,10 @@ SELECT COUNT(*) FROM publication
             @Param("annee") int annee,
             @Param("mois") int mois
     );
+    @Query(value = """
+          SELECT COUNT(*) FROM demandeami
+         WHERE (idemetteur = :userId OR idrecepteur = :userId)
+          AND statutdemande = 'ACCEPTEE'
+        """, nativeQuery = true)
+    int countTotalAmis(@Param("userId") Long userId);
 }
