@@ -42,6 +42,7 @@ public class StatsActiviteService {
             moisPrecedent = 12;
             anneePrecedente = annee - 1;
         }
+
         int publicationsPrecedent = statsActiviteRepository.countPublicationsMois(userId, anneePrecedente, moisPrecedent);
         int interactionsPrecedent = statsActiviteRepository.countInteractionsMois(userId, anneePrecedente, moisPrecedent);
         int amisPrecedent = statsActiviteRepository.countAmisAcceptesMois(userId, anneePrecedente, moisPrecedent);
@@ -49,6 +50,23 @@ public class StatsActiviteService {
         double pourcentagePublications = calculerPourcentage(publicationsPrecedent, publications);
         double pourcentageInteractions = calculerPourcentage(interactionsPrecedent, interactions);
         double pourcentageAmis = calculerPourcentage(amisPrecedent, amisMois);
+        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println("DATE  "+mois+"/"+annee);
+        System.out.println("-----------------------------------------------------------------------------------------");
+
+        System.out.println("nombre de publication  :"+publications);
+        System.out.println("publications du mois precedent"+"("+moisPrecedent+"/"+annee+")  : "+ publicationsPrecedent);
+        System.out.println("pourcentage publication  :"+pourcentagePublications+"%");
+
+        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println("nombre de interaction  :"+interactions);
+        System.out.println("Intreractions du mois precedent  "+"("+moisPrecedent+"/"+annee+") :"+ interactionsPrecedent);
+        System.out.println("pourcentage interaction  "+pourcentageInteractions+"%");
+        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println("Nouveau amis  : "+amisMois);
+        System.out.println("pourcentage Amis : "+pourcentageAmis+"%");
+        System.out.println("-----------------------------------------------------------------------------------------");
+        System.out.println("Total des amis    : "+amisTotal);
         return new StatsActivite(
                 publications,
                 publicationsPrecedent,
