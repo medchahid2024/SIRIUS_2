@@ -74,3 +74,6 @@ export function getFeed(userId, offset = 0, limit = 10) {
         .get(`/api/feed/${userId}`, { params: { offset, limit } })
         .then((r) => r.data);
 }
+export function getStatsActivite(userId, annee, mois) {
+    return api.get(`/api/stats/activite/${userId}`, { params: { annee, mois } }).then((r) => r.data);
+}
