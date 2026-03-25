@@ -86,7 +86,7 @@ public class StatsActiviteService {
                 mois
         );
     }
-    private double calculerPourcentage(int ancien, int nouveau) {
+    public double calculerPourcentage(int ancien, int nouveau) {
         if (ancien == 0) {
             return nouveau > 0 ? 100.0 : 0.0;
         }
