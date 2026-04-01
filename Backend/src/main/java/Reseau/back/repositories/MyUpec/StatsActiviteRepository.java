@@ -1,0 +1,53 @@
+package Reseau.back.repositories.MyUpec;
+
+import Reseau.back.models.MyUpec.Utilisateur;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface StatsActiviteRepository extends JpaRepository<Utilisateur, Long> {
+
+    @Query(value = """
+SELECT COUNT(*) FROM publication
+        WHERE idutilisateur = :userId
+          AND EXTRACT(YEAR FROM datecreation) = :annee
+          AND EXTRACT(MONTH FROM datecreation) = :mois
+        """, nativeQuery = true)
+    int countPublicationsMois(
+            @Param("userId") Long userId,
+            @Param("annee") int annee,
+            @Param("mois") int mois
+    );
+
+    @Query(value = """
+    SELECT COUNT(*) FROM interaction
+        WHERE idutilisateur = :userId
+          AND EXTRACT(YEAR FROM dateinteraction) = :annee
+          AND EXTRACT(MONTH FROM dateinteraction) = :mois
+        """, nativeQuery = true)
+    int countInteractionsMois(
+            @Param("userId") Long userId,
+            @Param("annee") int annee,
+            @Param("mois") int mois
+    );
+    @Query(value = """
+          SELECT COUNT(*) FROM demandeami
+        WHERE (idemetteur = :userId OR idrecepteur = :userId)
+          AND statutdemande = 'ACCEPTEE'
+          AND EXTRACT(YEAR FROM datereponse) = :annee
+          AND EXTRACT(MONTH FROM datereponse) = :mois
+        """, nativeQuery = true)
+    int countAmisAcceptesMois(
+            @Param("userId") Long userId,
+            @Param("annee") int annee,
+            @Param("mois") int mois
+    );
+    @Query(value = """
+          SELECT COUNT(*) FROM demandeami
+         WHERE (idemetteur = :userId OR idrecepteur = :userId)
+          AND statutdemande = 'ACCEPTEE'
+        """, nativeQuery = true)
+    int countTotalAmis(@Param("userId") Long userId);
+}
