@@ -23,3 +23,4 @@ US4 Filtre mois précédent                      |
  (connexions, publications, interactions, etc.) sous forme de graphes.
   Si je change de mois via le sélecteur, le front rappelle GET /api/stats/activite?month=... 
   et l’affichage se met à jour sans recharger la page.
+---------------------------------------------------------------------------------------
