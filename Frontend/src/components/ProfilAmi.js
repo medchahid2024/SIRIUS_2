@@ -83,7 +83,7 @@ export default function ProfilAmi() {
 
     const getBouton = () => {
         switch (statut) {case "ENVOI":
-            return { texte: "Envoi...", disabled: true, classe: "btn-outline-light" };
+                return { texte: "Envoi...", disabled: true, classe: "btn-outline-light" };
             case "ENVOYE":
                 return { texte: "Demande envoyée", disabled: true, classe: "btn-secondary" };
             case "RECU":
