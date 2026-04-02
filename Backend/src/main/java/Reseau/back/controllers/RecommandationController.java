@@ -12,10 +12,10 @@ public class RecommandationController {
     @Autowired
     private RecommandationService recommandationService;
 
-    @GetMapping("/v1/{userId}")
-    public ResponseEntity<String> lancerRecoV1(@PathVariable Long userId) {
-        recommandationService.afficherScoresV1(userId);
-        return ResponseEntity.ok("Reco V1 lancée (voir console backend) pour userId=" + userId);
-
-    }
+//    @GetMapping("/v1/{userId}")
+//    public ResponseEntity<String> lancerRecoV1(@PathVariable Long userId) {
+//        recommandationService.afficherScoresV1(userId);
+//        return ResponseEntity.ok("Reco V1 lancée (voir console backend) pour userId=" + userId);
+//
+//    }
 }
