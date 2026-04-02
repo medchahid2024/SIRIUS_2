@@ -1,0 +1,79 @@
+.historique-container {
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.historique-titre {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.historique-filtres {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.historique-filtres select {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.historique-filtres select:hover {
+    border-color: #999;
+}
+
+.stats-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.stat-card {
+    flex: 1;
+    min-width: 150px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h4 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.stat-valeur {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 10px 0;
+    color: #333;
+}
+
+.pourcentage-positif {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.pourcentage-negatif {
+    color: #dc3545;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.pourcentage-neutre {
+    color: #6c757d;
+    font-weight: bold;
+    font-size: 14px;
+}

@@ -8,6 +8,7 @@ import Statistiques from "./Statistiques";
 import Publication from "./Publication";
 import Messagerie from "./Messagerie";
 import ProfilAmi from "./ProfilAmi";
+import HistoriqueActivite from "./HistoriqueActivite";
 
 
 
@@ -30,6 +31,7 @@ export default function Router() {
                                     <Route path="/Statistiques/:id" element={<Statistiques />} />
                                     <Route path="/Messagerie" element={<Messagerie />} />
                                     <Route path="/ProfilAmi" element={<ProfilAmi />} />
+                                    <Route path="/HistoriqueActivite/:id" element={<HistoriqueActivite />} />
                                 </Routes>
                             </>
                         }
