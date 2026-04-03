@@ -68,3 +68,9 @@ export function getStatutRelation(myId, amiId) {
 export function accepterDemandeAmi(myId, amiId) {
     return api.post("/MyUpec/ami/accepter", null, { params: { myId, amiId } }).then((r) => r.data);
 }
+
+export function getFeed(userId, offset = 0, limit = 10) {
+    return api
+        .get(`/api/feed/${userId}`, { params: { offset, limit } })
+        .then((r) => r.data);
+}

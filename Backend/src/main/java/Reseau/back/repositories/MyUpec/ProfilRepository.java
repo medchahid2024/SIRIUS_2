@@ -15,6 +15,9 @@ public interface ProfilRepository extends JpaRepository<Profil, Long> {
 
 @Query(value ="SELECT * FROM Profil",nativeQuery = true)
      List<Profil> findAllProfils();
+     /*-------------------------------------------------------------------------------------------------------   */
+     /*-------------------------------------------------------------------------------------------------------   */
+     /*-------------------------------------------Afficher le profil d'utilisateur connecte------------------------------------------------------------   */
 
 @Query(value ="SELECT * FROM Profil p utilisateur u  WHERE p.idutilisateur=u.idutilisateur AND =idprofil= :id ",nativeQuery = true)
 Optional<Profil> findProfilById(@Param("id") Long id);
@@ -22,5 +25,8 @@ Optional<Profil> findProfilById(@Param("id") Long id);
      Optional<Profil> findByUtilisateur_IdUtilisateur(Long idUtilisateur);
 
 }
+/*-------------------------------------------------------------------------------------------------------   */
+/*-------------------------------------------------------------------------------------------------------   */
+
 
 
