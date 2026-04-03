@@ -227,6 +227,11 @@ export default function Messagerie() {
         subMsgRef.current = null;
         subTypingRef.current = null;
 
+        client.publish({
+            destination: `/app/conversations/${activeConv}/active`,
+            body: JSON.stringify({ userId: user.idUtilisateur, conversationId: activeConv, active: true }),
+        });
+
         subMsgRef.current = client.subscribe(
             `/topic/conversations/${activeConv}`,
             (frame) => {
@@ -257,6 +262,12 @@ export default function Messagerie() {
             subTypingRef.current?.unsubscribe();
             subMsgRef.current = null;
             subTypingRef.current = null;
+            if (client?.connected) {
+                client.publish({
+                    destination: `/app/conversations/${activeConv}/active`,
+                    body: JSON.stringify({ userId: user.idUtilisateur, conversationId: activeConv, active: false }),
+                });
+            }
         };
     }, [activeConv, user?.idUtilisateur, refreshInbox]);
 

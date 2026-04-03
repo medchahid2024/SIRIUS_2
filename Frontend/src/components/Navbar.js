@@ -1,13 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.jpeg";
 import "../styles/Home.css";
 import { getTotalUnread } from "../API/api";
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+import apiClient from "../API/apiClient";
 
 export default function Navbar() {
     const [user, setUser] = useState(null);
     const [unreadTotal, setUnreadTotal] = useState(0);
     const navigate = useNavigate();
+    const stompRef = useRef(null);
+
+    const wsUrl = useMemo(() => {
+        const base = (apiClient.defaults.baseURL || "").replace(/\/$/, "");
+        return `${base}/ws`;
+    }, []);
 
     useEffect(() => {
         const u = localStorage.getItem("user");
@@ -17,17 +26,35 @@ export default function Navbar() {
     useEffect(() => {
         if (!user?.idUtilisateur) return;
 
-        const tick = async () => {
+        const fetchUnread = async () => {
             try {
                 const n = await getTotalUnread(user.idUtilisateur);
                 setUnreadTotal(Number(n) || 0);
             } catch {}
         };
 
-        tick();
-        const id = setInterval(tick, 5000);
-        return () => clearInterval(id);
-    }, [user?.idUtilisateur]);
+        fetchUnread();
+
+        if (stompRef.current) return;
+
+        const client = new Client({
+            webSocketFactory: () => new SockJS(wsUrl),
+            reconnectDelay: 3000,
+            onConnect: () => {
+                client.subscribe(`/topic/unread/${user.idUtilisateur}`, () => {
+                    fetchUnread();
+                });
+            },
+        });
+
+        client.activate();
+        stompRef.current = client;
+
+        return () => {
+            client.deactivate();
+            stompRef.current = null;
+        };
+    }, [user?.idUtilisateur, wsUrl]);
 
 
     const goMessagerieInbox = () => {

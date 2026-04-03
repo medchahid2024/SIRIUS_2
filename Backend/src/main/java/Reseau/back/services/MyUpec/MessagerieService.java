@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class MessagerieService {
@@ -24,10 +26,23 @@ public class MessagerieService {
     private MessageRepository messageRepository;
     @Autowired
     private UtilisateurRepository utilisateurRepository;
-
-
     @Autowired(required = false)
     private SimpMessagingTemplate messagingTemplate;
+
+    private final Map<Long, List<Long>> actifsParConv = new HashMap<>();
+
+    public void ajouterActif(Long convId, Long userId) {
+        if (!actifsParConv.containsKey(convId)) {
+            actifsParConv.put(convId, new ArrayList<>());
+        }
+        actifsParConv.get(convId).add(userId);
+    }
+
+    public void retirerActif(Long convId, Long userId) {
+        if (actifsParConv.containsKey(convId)) {
+            actifsParConv.get(convId).remove(userId);
+        }
+    }
 
     public record UserMiniDto(Long idUtilisateur, String nom, String prenom) {}
 
@@ -38,6 +53,9 @@ public class MessagerieService {
 
     public record MessageDto(Long idMessage, Long conversationId, Long senderId,
                              String senderNom, String senderPrenom, String contenu, Instant sentAt) {}
+
+    public record NotificationDto(Long conversationId, Long senderId, String senderNom,
+                                  String senderPrenom, String contenu, Instant sentAt, long unreadCount) {}
 
 
     @Transactional(readOnly = true)
@@ -114,9 +132,34 @@ public class MessagerieService {
 
         if (messagingTemplate != null) {
             messagingTemplate.convertAndSend("/topic/conversations/" + conversationId, dto);
+            notifierParticipants(conv, saved, senderId);
         }
 
         return dto;
+    }
+
+    private void notifierParticipants(Conversation conv, Message msg, Long senderId) {
+        for (Utilisateur participant : conv.getParticipants()) {
+            Long participantId = participant.getIdUtilisateur();
+            if (participantId.equals(senderId)) continue;
+
+            List<Long> actifs = actifsParConv.get(conv.getIdConversation());
+            boolean isActive = actifs != null && actifs.contains(participantId);
+
+            if (!isActive) {
+                long unreadCount = messageRepository.countUnreadForConversation(conv.getIdConversation(), participantId);
+                NotificationDto notification = new NotificationDto(
+                        conv.getIdConversation(),
+                        senderId,
+                        msg.getSender().getNom(),
+                        msg.getSender().getPrenom(),
+                        msg.getContenu(),
+                        msg.getSentAt(),
+                        unreadCount
+                );
+                messagingTemplate.convertAndSend("/topic/unread/" + participantId, notification);
+            }
+        }
     }
 
     private void ensureParticipant(Conversation conv, Long userId) {
