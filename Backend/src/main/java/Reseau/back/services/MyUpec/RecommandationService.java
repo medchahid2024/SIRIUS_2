@@ -121,13 +121,14 @@ private List<PublicationRecoDTO> getPersonalRecommendations(Long userId, int off
 
             Publication p = scored.get(i).p;
 
-            result.add(new PublicationRecoDTO(
-                    p.getIdPublication(),
-                    p.getContenuTexte(),
-                    p.getTypePublication(),
-                    p.getDateCreation(),
-                    scored.get(i).score
-            ));
+           result.add(new PublicationRecoDTO(
+        p.getIdPublication(),
+        p.getContenuTexte(),
+        p.getTypePublication(),
+        p.getDateCreation(),
+        scored.get(i).score,
+        p.getMediaURL()
+));
         }
 
         return result;
@@ -165,12 +166,13 @@ private List<PublicationRecoDTO> getSocialRecommendations(Long userId,int limit)
             double score = nb + 1/(1+ageHours);
 
             result.add(new PublicationRecoDTO(
-                    p.getIdPublication(),
-                    p.getContenuTexte(),
-                    p.getTypePublication(),
-                    p.getDateCreation(),
-                    score
-            ));
+        p.getIdPublication(),
+        p.getContenuTexte(),
+        p.getTypePublication(),
+        p.getDateCreation(),
+        score,
+        p.getMediaURL()
+));
         }
 
         result.sort((a,b)->Double.compare(b.getScore(),a.getScore()));
