@@ -16,7 +16,7 @@ export default function Authentification() {
         setError("");
         try {
             const user = await login(email, password);localStorage.setItem("user", JSON.stringify(user));
-            navigate("/Home");
+            navigate("/Publication");
         } catch (err) {
             if (err.response?.status === 401) setError("Email ou mot de passe incorrect.");
             else setError("Erreur serveur.");

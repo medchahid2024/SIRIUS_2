@@ -1,0 +1,145 @@
+.sirius-navbar {
+  background: #df2f43;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.sirius-navbar * {
+  box-sizing: border-box;
+}
+
+.sirius-navbar button {
+  outline: none;
+}
+
+.sirius-navbar a {
+  text-decoration: none;
+}
+
+.sirius-navbar-inner {
+  min-height: 82px;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.sirius-logo-link {
+  display: flex;
+  align-items: center;
+}
+
+.sirius-logo {
+  width: 105px;
+  height: 58px;
+  object-fit: contain;
+  background: white;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.sirius-links {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.sirius-nav-link,
+.sirius-nav-button,
+.sirius-user-link {
+  position: relative;
+  color: white;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  padding: 8px 4px;
+  font-size: 16px;
+}
+
+.sirius-nav-link:hover,
+.sirius-nav-button:hover,
+.sirius-user-link:hover {
+  color: white;
+  opacity: 0.85;
+}
+
+.sirius-nav-link.active {
+  border-bottom: 2px solid white;
+}
+
+.sirius-user-link {
+  max-width: 150px;
+  line-height: 18px;
+  text-align: left;
+}
+
+.sirius-badge {
+  position: absolute;
+  top: -4px;
+  right: -12px;
+  min-width: 20px;
+  height: 20px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: white;
+  color: #df2f43;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sirius-logout {
+  border: 1px solid white;
+  background: transparent;
+  color: white;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+}
+
+.sirius-logout:hover {
+  background: white;
+  color: #df2f43;
+}
+
+@media (max-width: 1000px) {
+  .sirius-navbar-inner {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .sirius-links {
+    margin-left: auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 650px) {
+  .sirius-navbar-inner {
+    padding: 10px 14px;
+  }
+
+  .sirius-logo {
+    width: 88px;
+    height: 50px;
+  }
+
+  .sirius-links {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .sirius-nav-link,
+  .sirius-nav-button,
+  .sirius-user-link {
+    font-size: 14px;
+  }
+}
