@@ -34,6 +34,7 @@ export default function Navbar() {
         };
 
         fetchUnread();
+        const pollId = setInterval(fetchUnread, 5000);
 
         if (stompRef.current) return;
 
@@ -51,6 +52,7 @@ export default function Navbar() {
         stompRef.current = client;
 
         return () => {
+            clearInterval(pollId);
             client.deactivate();
             stompRef.current = null;
         };
