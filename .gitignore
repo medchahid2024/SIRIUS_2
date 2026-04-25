@@ -4,3 +4,4 @@ node_modules/
 target/
 build/
 .DS_Store
+Backend/src/main/resources/application-local.properties
