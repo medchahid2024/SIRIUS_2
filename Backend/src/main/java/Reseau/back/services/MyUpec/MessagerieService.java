@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class MessagerieService {
@@ -29,7 +29,7 @@ public class MessagerieService {
     @Autowired(required = false)
     private SimpMessagingTemplate messagingTemplate;
 
-    private final Map<Long, List<Long>> actifsParConv = new HashMap<>();
+    private final Map<Long, List<Long>> actifsParConv = new ConcurrentHashMap<>();
 
     public void ajouterActif(Long convId, Long userId) {
         if (!actifsParConv.containsKey(convId)) {
@@ -49,7 +49,11 @@ public class MessagerieService {
 
     public record ConversationDto(Long idConversation, UserMiniDto other,
                                   String lastMessage, Instant lastMessageAt,
-                                  long unreadCount) {}
+                                  long unreadCount, Long lastSenderId,
+                                  String lastSenderPrenom,
+                                  String nom, boolean isGroupe,
+                                  List<UserMiniDto> membres,
+                                  Long creatorId) {}
 
     public record MessageDto(Long idMessage, Long conversationId, Long senderId,
                              String senderNom, String senderPrenom, String contenu, Instant sentAt) {}
@@ -87,6 +91,73 @@ public class MessagerieService {
         Conversation saved = conversationRepository.save(c);
 
         return toConversationDto(saved, fromUserId);
+    }
+
+    @Transactional
+    public ConversationDto createGroup(String nom, Long creatorId, List<Long> participantIds) {
+        if (nom == null || nom.trim().isEmpty()) throw new IllegalArgumentException("nom requis");
+        if (participantIds == null || participantIds.isEmpty()) throw new IllegalArgumentException("Au moins un participant requis");
+
+        List<Long> allIds = new ArrayList<>(participantIds);
+        if (!allIds.contains(creatorId)) allIds.add(creatorId);
+
+        List<Utilisateur> participants = utilisateurRepository.findAllById(allIds);
+
+        Conversation c = new Conversation();
+        c.setNom(nom.trim());
+        c.setGroupe(true);
+        c.setCreatorId(creatorId);
+        c.setParticipants(new ArrayList<>(participants));
+        c.setCreatedAt(Instant.now());
+        c.setUpdatedAt(Instant.now());
+
+        Conversation saved = conversationRepository.save(c);
+        return toConversationDto(saved, creatorId);
+    }
+
+    @Transactional
+    public ConversationDto ajouterMembre(Long convId, Long requesterId, Long newUserId) {
+        Conversation conv = conversationRepository.findById(convId)
+                .orElseThrow(() -> new IllegalArgumentException("Groupe introuvable"));
+        if (!conv.isGroupe()) throw new IllegalArgumentException("Pas un groupe");
+        if (!requesterId.equals(conv.getCreatorId())) throw new IllegalArgumentException("Seul le créateur peut ajouter des membres");
+
+        boolean dejaPresent = conv.getParticipants().stream().anyMatch(u -> newUserId.equals(u.getIdUtilisateur()));
+        if (dejaPresent) throw new IllegalArgumentException("Déjà membre");
+
+        Utilisateur newUser = utilisateurRepository.findById(newUserId)
+                .orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable"));
+
+        conv.getParticipants().add(newUser);
+        conv.setUpdatedAt(Instant.now());
+        conversationRepository.save(conv);
+        return toConversationDto(conv, requesterId);
+    }
+
+    @Transactional
+    public void quitterGroupe(Long convId, Long userId) {
+        Conversation conv = conversationRepository.findById(convId)
+                .orElseThrow(() -> new IllegalArgumentException("Groupe introuvable"));
+        if (!conv.isGroupe()) throw new IllegalArgumentException("Pas un groupe");
+        boolean estMembre = conv.getParticipants().stream().anyMatch(u -> userId.equals(u.getIdUtilisateur()));
+        if (!estMembre) throw new IllegalArgumentException("Non membre");
+        conv.getParticipants().removeIf(u -> userId.equals(u.getIdUtilisateur()));
+        conv.setUpdatedAt(Instant.now());
+        conversationRepository.save(conv);
+    }
+
+    @Transactional
+    public ConversationDto supprimerMembre(Long convId, Long requesterId, Long targetUserId) {
+        Conversation conv = conversationRepository.findById(convId)
+                .orElseThrow(() -> new IllegalArgumentException("Groupe introuvable"));
+        if (!conv.isGroupe()) throw new IllegalArgumentException("Pas un groupe");
+        if (!requesterId.equals(conv.getCreatorId())) throw new IllegalArgumentException("Seul le créateur peut supprimer des membres");
+        if (targetUserId.equals(requesterId)) throw new IllegalArgumentException("Impossible de se retirer soi-même");
+
+        conv.getParticipants().removeIf(u -> targetUserId.equals(u.getIdUtilisateur()));
+        conv.setUpdatedAt(Instant.now());
+        conversationRepository.save(conv);
+        return toConversationDto(conv, requesterId);
     }
 
     @Transactional(readOnly = true)
@@ -174,24 +245,33 @@ public class MessagerieService {
 
         String last = null;
         Instant lastAt = null;
+        Long lastSenderId = null;
+        String lastSenderPrenom = null;
         var lastMsg = messageRepository.findTop1ByConversation_IdConversationOrderBySentAtDesc(c.getIdConversation());
         if (lastMsg.isPresent()) {
             last = lastMsg.get().getContenu();
             lastAt = lastMsg.get().getSentAt();
+            lastSenderId = lastMsg.get().getSender().getIdUtilisateur();
+            lastSenderPrenom = lastMsg.get().getSender().getPrenom();
         }
 
         long unread = 0;
         try {
             unread = messageRepository.countUnreadForConversation(c.getIdConversation(), viewerId);
-        } catch (Exception ignored) {
-
+        } catch (Exception e) {
             unread = 0;
         }
 
         UserMiniDto otherDto = (other == null) ? null
                 : new UserMiniDto(other.getIdUtilisateur(), other.getNom(), other.getPrenom());
 
-        return new ConversationDto(c.getIdConversation(), otherDto, last, lastAt, unread);
+        List<UserMiniDto> membres = c.isGroupe()
+                ? c.getParticipants().stream()
+                    .map(u -> new UserMiniDto(u.getIdUtilisateur(), u.getNom(), u.getPrenom()))
+                    .toList()
+                : null;
+
+        return new ConversationDto(c.getIdConversation(), otherDto, last, lastAt, unread, lastSenderId, lastSenderPrenom, c.getNom(), c.isGroupe(), membres, c.getCreatorId());
     }
 
     @Transactional(readOnly = true)
@@ -206,12 +286,12 @@ public class MessagerieService {
 
         return toutesConversations.stream()
                 .filter(conv -> {
+                    if (conv.isGroupe()) {
+                        return conv.nom() != null && conv.nom().toLowerCase().contains(recherche);
+                    }
                     if (conv.other() == null) return false;
-
-                    String nom = conv.other().nom().toLowerCase();
-                    String prenom = conv.other().prenom().toLowerCase();
-
-                    return nom.contains(recherche) || prenom.contains(recherche);
+                    return conv.other().nom().toLowerCase().contains(recherche)
+                            || conv.other().prenom().toLowerCase().contains(recherche);
                 })
                 .toList();
     }

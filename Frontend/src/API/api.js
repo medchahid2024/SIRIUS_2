@@ -52,6 +52,22 @@ export function getTotalUnread(userId) {
 export function getOnlineUsers() {
     return api.get(`/MyUpec/messagerie/presence/online`).then((r) => r.data);
 }
+
+export function createGroupe(nom, creatorId, participantIds) {
+    return api.post(`/MyUpec/messagerie/groupes`, { nom, creatorId, participantIds }).then((r) => r.data);
+}
+
+export function ajouterMembre(convId, requesterId, userId) {
+    return api.post(`/MyUpec/messagerie/groupes/${convId}/membres`, { requesterId, userId }).then((r) => r.data);
+}
+
+export function supprimerMembre(convId, requesterId, userId) {
+    return api.delete(`/MyUpec/messagerie/groupes/${convId}/membres/${userId}`, { params: { requesterId } }).then((r) => r.data);
+}
+
+export function quitterGroupe(convId, userId) {
+    return api.delete(`/MyUpec/messagerie/groupes/${convId}/quitter`, { params: { userId } }).then((r) => r.data);
+}
 export function getProfil(userId) {
     return api.get(`/MyUpec/profil/monProfil/${userId}`).then((r) => r.data);
 
