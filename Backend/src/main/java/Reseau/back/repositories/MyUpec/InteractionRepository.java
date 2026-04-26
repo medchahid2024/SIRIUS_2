@@ -75,6 +75,34 @@ List<Object[]> findFriendPopularPublicationsNotInteracted(
         @Param("friendIds") List<Long> friendIds
 );
 
+@Query(
+    value = """
+        SELECT COUNT(*)
+        FROM interaction
+        WHERE idpublication = :publicationId
+          AND typeinteraction = :type
+    """,
+    nativeQuery = true
+)
+long countByPublicationAndType(
+        @Param("publicationId") Long publicationId,
+        @Param("type") String type
+);
+
+@Query(
+    value = """
+        SELECT contenucommentaire
+        FROM interaction
+        WHERE idpublication = :publicationId
+          AND typeinteraction = 'COMMENTAIRE'
+          AND contenucommentaire IS NOT NULL
+          AND TRIM(contenucommentaire) <> ''
+        ORDER BY dateinteraction DESC
+        LIMIT 3
+    """,
+    nativeQuery = true
+)
+List<String> findLastCommentsByPublication(@Param("publicationId") Long publicationId);
 
 
 }

@@ -212,4 +212,32 @@
     min-width: 46px;
     font-size: 1rem;
   }
+
+
+
+.social-comments-box {
+  padding: 0 20px 18px;
+  background: #fcfdff;
 }
+
+.social-comment {
+  background: #f3f6fb;
+  border-radius: 14px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.social-comment-empty {
+  color: #6b7280;
+  font-size: 0.95rem;
+  padding: 10px 0 2px;
+}
+
+
+  .social-comments-box {
+    padding: 0 14px 14px;
+  }
+}
+

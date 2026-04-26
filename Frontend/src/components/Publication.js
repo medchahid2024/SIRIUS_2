@@ -8,7 +8,7 @@ export default function Publication() {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+const [openedComments, setOpenedComments] = useState({});
   const limit = 10;
 
   const load = useCallback(
@@ -51,6 +51,13 @@ export default function Publication() {
   useEffect(() => {
     load(true);
   }, [load]);
+
+  const toggleComments = (idPublication) => {
+  setOpenedComments((prev) => ({
+    ...prev,
+    [idPublication]: !prev[idPublication],
+  }));
+};
 
   const getMediaUrl = (url) => {
     if (!url || typeof url !== "string") return null;
@@ -148,21 +155,41 @@ export default function Publication() {
               )}
 
               <div className="social-post-actions">
-                <button type="button" className="social-action-btn">
-                  <span className="social-action-icon">♡</span>
-                  <span>Like</span>
-                </button>
+  <button type="button" className="social-action-btn">
+    <span className="social-action-icon">♡</span>
+    <span>{p.nbLikes || 0} Likes</span>
+  </button>
 
-                <button type="button" className="social-action-btn">
-                  <span className="social-action-icon">💬</span>
-                  <span>Commentaire</span>
-                </button>
+  <button
+    type="button"
+    className="social-action-btn"
+    onClick={() => toggleComments(p.idPublication)}
+  >
+    <span className="social-action-icon">💬</span>
+    <span>{p.nbCommentaires || 0} Commentaires</span>
+  </button>
 
-                <button type="button" className="social-action-btn">
-                  <span className="social-action-icon">↗</span>
-                  <span>Partage</span>
-                </button>
-              </div>
+  <button type="button" className="social-action-btn">
+    <span className="social-action-icon">↗</span>
+    <span>{p.nbPartages || 0} Partages</span>
+  </button>
+</div>
+
+{openedComments[p.idPublication] && (
+  <div className="social-comments-box">
+    {Array.isArray(p.commentaires) && p.commentaires.length > 0 ? (
+      p.commentaires.map((commentaire, index) => (
+        <div className="social-comment" key={`${p.idPublication}-${index}`}>
+          {commentaire}
+        </div>
+      ))
+    ) : (
+      <div className="social-comment-empty">
+        Aucun commentaire pour le moment.
+      </div>
+    )}
+  </div>
+)}
             </article>
           );
         })}

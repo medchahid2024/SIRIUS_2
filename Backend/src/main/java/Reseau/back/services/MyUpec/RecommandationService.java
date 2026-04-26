@@ -121,13 +121,19 @@ private List<PublicationRecoDTO> getPersonalRecommendations(Long userId, int off
 
             Publication p = scored.get(i).p;
 
-           result.add(new PublicationRecoDTO(
-        p.getIdPublication(),
+           Long publicationId = p.getIdPublication();
+
+result.add(new PublicationRecoDTO(
+        publicationId,
         p.getContenuTexte(),
         p.getTypePublication(),
         p.getDateCreation(),
         scored.get(i).score,
-        p.getMediaURL()
+        p.getMediaURL(),
+        interactionRepository.countByPublicationAndType(publicationId, "LIKE"),
+        interactionRepository.countByPublicationAndType(publicationId, "COMMENTAIRE"),
+        interactionRepository.countByPublicationAndType(publicationId, "PARTAGE"),
+        Collections.emptyList()
 ));
         }
 
@@ -165,13 +171,19 @@ private List<PublicationRecoDTO> getSocialRecommendations(Long userId,int limit)
 
             double score = nb + 1/(1+ageHours);
 
-            result.add(new PublicationRecoDTO(
-        p.getIdPublication(),
+            Long publicationId = p.getIdPublication();
+
+result.add(new PublicationRecoDTO(
+        publicationId,
         p.getContenuTexte(),
         p.getTypePublication(),
         p.getDateCreation(),
         score,
-        p.getMediaURL()
+        p.getMediaURL(),
+        interactionRepository.countByPublicationAndType(publicationId, "LIKE"),
+        interactionRepository.countByPublicationAndType(publicationId, "COMMENTAIRE"),
+        interactionRepository.countByPublicationAndType(publicationId, "PARTAGE"),
+        Collections.emptyList()
 ));
         }
 
