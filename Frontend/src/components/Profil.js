@@ -44,6 +44,9 @@ export default function Profil() {
                 <Link to={`/Statistiques/${user?.idUtilisateur}`}>
                     <p className="profil-title">Voir les statistiques</p>
                 </Link>
+                <Link to={`/HistoriqueActivite/${user?.idUtilisateur}`}>
+                    <p className="profil-title" style={{color:"red"}}>Historique d'activite</p>
+                </Link>
 
                 <p
                     className="profil-title"
