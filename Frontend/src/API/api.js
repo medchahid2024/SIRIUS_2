@@ -68,6 +68,15 @@ export function supprimerMembre(convId, requesterId, userId) {
 export function quitterGroupe(convId, userId) {
     return api.delete(`/MyUpec/messagerie/groupes/${convId}/quitter`, { params: { userId } }).then((r) => r.data);
 }
+
+export function sendFichier(convId, senderId, fichier) {
+    const formData = new FormData();
+    formData.append("senderId", senderId);
+    formData.append("fichier", fichier);
+    return api.post(`/MyUpec/messagerie/conversations/${convId}/fichiers`, formData, {
+        headers: { "Content-Type": undefined }
+    }).then((r) => r.data);
+}
 export function getProfil(userId) {
     return api.get(`/MyUpec/profil/monProfil/${userId}`).then((r) => r.data);
 

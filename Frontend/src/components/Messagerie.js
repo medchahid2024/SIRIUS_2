@@ -14,6 +14,7 @@ import {
     ajouterMembre,
     supprimerMembre,
     quitterGroupe,
+    sendFichier,
 } from "../API/api";
 
 import { Client } from "@stomp/stompjs";
@@ -57,6 +58,7 @@ export default function Messagerie() {
 
     const knownMessageIdsRef = useRef(new Set());
     const endRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     const wsUrl = useMemo(() => {
         const base = (apiClient.defaults.baseURL || "").replace(/\/$/, "");
@@ -397,6 +399,23 @@ export default function Messagerie() {
         }
     };
 
+    const handleSendFile = async (e) => {
+        const fichier = e.target.files[0];
+        if (!fichier || !activeConv || !user?.idUtilisateur) return;
+        e.target.value = "";
+        try {
+            const msg = await sendFichier(activeConv, user.idUtilisateur, fichier);
+            if (msg?.idMessage && !knownMessageIdsRef.current.has(msg.idMessage)) {
+                knownMessageIdsRef.current.add(msg.idMessage);
+                setMessages((prev) => [...prev, msg]);
+            }
+            markConversationRead(activeConv, user.idUtilisateur).catch(() => {});
+            await refreshInbox(user.idUtilisateur);
+        } catch {
+            setError("Impossible d'envoyer le fichier.");
+        }
+    };
+
     const handleCreateGroup = async () => {
         if (!groupName.trim() || selectedFriends.length < 2) return;
         try {
@@ -674,7 +693,24 @@ export default function Messagerie() {
                                                             {m.senderNom} {m.senderPrenom}
                                                         </div>
                                                     )}
-                                                    {m.contenu}
+                                                    {m.fichierUrl ? (
+                                                        (m.fichierNom?.endsWith('.png') || m.fichierNom?.endsWith('.jpg') || m.fichierNom?.endsWith('.jpeg')) ? (
+                                                            <img
+                                                                src={`${apiClient.defaults.baseURL}${m.fichierUrl}`}
+                                                                alt={m.fichierNom}
+                                                                style={{ maxWidth: 200, borderRadius: 8, display: "block" }}
+                                                            />
+                                                        ) : (
+                                                            <a
+                                                                href={`${apiClient.defaults.baseURL}${m.fichierUrl}`}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                style={{ color: mine ? "#fff" : "#dc3545" }}
+                                                            >
+                                                                {m.fichierNom}
+                                                            </a>
+                                                        )
+                                                    ) : m.contenu}
                                                 </div>
                                             </div>
                                         );
@@ -693,6 +729,20 @@ export default function Messagerie() {
                                         onChange={(e) => onChangeText(e.target.value)}
                                         onKeyDown={(e) => e.key === "Enter" && onSend()}
                                     />
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        style={{ display: "none" }}
+                                        accept=".png,.jpg,.jpeg,.pdf,.docx,.pptx"
+                                        onChange={handleSendFile}
+                                    />
+                                    <button
+                                        className="btn btn-outline-secondary"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        title="Joindre un fichier"
+                                    >
+                                        Joindre
+                                    </button>
                                     <button className="btn btn-danger" onClick={onSend}>
                                         Envoyer
                                     </button>

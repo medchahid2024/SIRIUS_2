@@ -7,14 +7,21 @@ import Reseau.back.repositories.MyUpec.ConversationRepository;
 import Reseau.back.repositories.MyUpec.MessageRepository;
 import Reseau.back.repositories.MyUpec.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -28,6 +35,9 @@ public class MessagerieService {
     private UtilisateurRepository utilisateurRepository;
     @Autowired(required = false)
     private SimpMessagingTemplate messagingTemplate;
+
+    @Value("${messagerie.upload.dir:uploads}")
+    private String uploadDir;
 
     private final Map<Long, List<Long>> actifsParConv = new ConcurrentHashMap<>();
 
@@ -56,7 +66,8 @@ public class MessagerieService {
                                   Long creatorId) {}
 
     public record MessageDto(Long idMessage, Long conversationId, Long senderId,
-                             String senderNom, String senderPrenom, String contenu, Instant sentAt) {}
+                             String senderNom, String senderPrenom, String contenu, Instant sentAt,
+                             String fichierUrl, String fichierNom) {}
 
     public record NotificationDto(Long conversationId, Long senderId, String senderNom,
                                   String senderPrenom, String contenu, Instant sentAt, long unreadCount) {}
@@ -295,6 +306,55 @@ public class MessagerieService {
                 })
                 .toList();
     }
+    @Transactional
+    public MessageDto sendFichier(Long convId, Long senderId, MultipartFile fichier) {
+        if (fichier == null || fichier.isEmpty()) throw new IllegalArgumentException("Fichier requis");
+
+        String originalName = fichier.getOriginalFilename();
+        String extension = (originalName != null && originalName.contains("."))
+                ? originalName.substring(originalName.lastIndexOf(".")).toLowerCase() : "";
+
+        List<String> extensionsAutorisees = List.of(".png", ".jpg", ".jpeg", ".pdf", ".docx", ".pptx");
+        if (!extensionsAutorisees.contains(extension)) throw new IllegalArgumentException("Type de fichier non autorisé");
+
+        Conversation conv = conversationRepository.findById(convId)
+                .orElseThrow(() -> new IllegalArgumentException("Conversation introuvable"));
+        ensureParticipant(conv, senderId);
+
+        Utilisateur sender = utilisateurRepository.findById(senderId)
+                .orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable"));
+        String nomStockage = UUID.randomUUID() + extension;
+
+        try {
+            Path dir = Paths.get(uploadDir);
+            Files.createDirectories(dir);
+            Files.copy(fichier.getInputStream(), dir.resolve(nomStockage));
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur lors de l'enregistrement du fichier");
+        }
+
+        Message m = new Message();
+        m.setConversation(conv);
+        m.setSender(sender);
+        m.setContenu("[Fichier: " + originalName + "]");
+        m.setFichierUrl("/MyUpec/messagerie/fichiers/" + nomStockage);
+        m.setFichierNom(originalName);
+        m.setSentAt(Instant.now());
+
+        Message saved = messageRepository.save(m);
+        conv.setUpdatedAt(Instant.now());
+        conversationRepository.save(conv);
+
+        MessageDto dto = toMessageDto(saved);
+
+        if (messagingTemplate != null) {
+            messagingTemplate.convertAndSend("/topic/conversations/" + convId, dto);
+            notifierParticipants(conv, saved, senderId);
+        }
+
+        return dto;
+    }
+
     private MessageDto toMessageDto(Message m) {
         Utilisateur s = m.getSender();
         return new MessageDto(
@@ -304,7 +364,9 @@ public class MessagerieService {
                 s.getNom(),
                 s.getPrenom(),
                 m.getContenu(),
-                m.getSentAt()
+                m.getSentAt(),
+                m.getFichierUrl(),
+                m.getFichierNom()
         );
     }
 }

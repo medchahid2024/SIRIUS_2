@@ -26,6 +26,12 @@ public class Message {
     @Column(name = "contenu", columnDefinition = "TEXT", nullable = false)
     private String contenu;
 
+    @Column(name = "fichier_url")
+    private String fichierUrl;
+
+    @Column(name = "fichier_nom")
+    private String fichierNom;
+
     @Column(name = "sent_at", nullable = false)
     private Instant sentAt;
 
