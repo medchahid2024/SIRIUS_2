@@ -151,6 +151,27 @@ public class MessagerieService {
         return new ConversationDto(c.getIdConversation(), otherDto, last, lastAt, unread);
     }
 
+    @Transactional(readOnly = true)
+    public List<ConversationDto> listConversationsFiltered(Long userId, String search) {
+        List<ConversationDto> toutesConversations = listConversations(userId);
+
+        if (search == null || search.trim().isEmpty()) {
+            return toutesConversations;
+        }
+
+        String recherche = search.toLowerCase().trim();
+
+        return toutesConversations.stream()
+                .filter(conv -> {
+                    if (conv.other() == null) return false;
+
+                    String nom = conv.other().nom().toLowerCase();
+                    String prenom = conv.other().prenom().toLowerCase();
+
+                    return nom.contains(recherche) || prenom.contains(recherche);
+                })
+                .toList();
+    }
     private MessageDto toMessageDto(Message m) {
         Utilisateur s = m.getSender();
         return new MessageDto(

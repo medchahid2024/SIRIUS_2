@@ -73,4 +73,15 @@ public class   MessagerieController {
     ) {
         return ResponseEntity.ok(messagerieService.sendMessage(conversationId, req.senderId(), req.contenu()));
     }
+    @GetMapping("/conversations/{userId}/filtered")
+    public ResponseEntity<List<MessagerieService.ConversationDto>> conversationsFiltrees(
+            @PathVariable Long userId,
+            @RequestParam(required = false) String recherche
+    ) {
+        List<MessagerieService.ConversationDto> conversations =
+                messagerieService.listConversationsFiltered(userId, recherche);
+
+        return ResponseEntity.ok(conversations);
+    }
+
 }

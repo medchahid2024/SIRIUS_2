@@ -8,6 +8,7 @@ import Statistiques from "./Statistiques";
 import Publication from "./Publication";
 import Messagerie from "./Messagerie";
 import ProfilAmi from "./ProfilAmi";
+import HistoriqueActivite from "./HistoriqueActivite";
 
 function DefaultRoute() {
   const user = localStorage.getItem("user");
