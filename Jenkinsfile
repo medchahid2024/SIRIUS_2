@@ -7,7 +7,7 @@ pipeline {
     BACKEND_JAR  = "Backend-1.0-SNAPSHOT.jar"
 
     DEPLOY_USER = "server"
-    DEPLOY_HOST = "172.31.250.140"
+    DEPLOY_HOST = "172.31.250.119"
 
     BACKEND_DEPLOY_PATH  = "/home/server/back"
     FRONTEND_DEPLOY_PATH = "/home/server/front"
