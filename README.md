@@ -104,3 +104,23 @@ US2 - Ajouter au 1er systeme de recommandations une influence des tags des centr
 US3 - Exposition du fil V2
 
 On repartit en 80/20 le % des publications affichées dans le fil par blocs de 10 avec 80% grâce au score des tags des publications avec lesquelles on a precedemment interagi et ceux du profil, en partageant selon les tops tags et 20% selon les publications avec lesquelles nos amis ont interagi.
+
+R3 - Amélioration du fil d’actualité et interface sociale
+
+US1 - Génération de données cohérentes
+Création d’un script Python permettant de générer automatiquement des utilisateurs, profils, publications, relations d’amis et interactions réalistes pour tester le réseau social à grande échelle.
+
+US2 - Modernisation de l’interface du fil
+Amélioration graphique des cartes publications avec affichage des images, catégories, dates, avatars et meilleure mise en page générale du feed.
+
+US3 - Amélioration de la navigation utilisateur
+Ajout d’une arrivée directe sur le fil d’actualité après connexion ainsi qu’une navbar plus moderne et plus lisible.
+
+US4 - Affichage des interactions sociales
+Ajout des compteurs de likes, commentaires et partages sous chaque publication avec récupération des données depuis le backend.
+
+US5 - Amélioration de l’algorithme de recommandation
+Ajout d’un système de diversification des contenus afin d’éviter les publications trop répétitives et amélioration de la prise en compte des interactions sociales des amis.
+
+US6 - Ajout de tests frontend
+Création de tests frontend simples avec Jest afin de vérifier l’affichage du fil d’actualité, des publications et des interactions sociales.
