@@ -1,5 +1,6 @@
 package Reseau.back.controllers;
 
+import Reseau.back.services.MyUpec.MessagerieService;
 import lombok.Data;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -18,12 +19,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MessagerieWsController {
 
     private final SimpMessagingTemplate messagingTemplate;
-
+    private final MessagerieService messagerieService;
 
     private final Map<Long, Integer> onlineCounts = new ConcurrentHashMap<>();
 
-    public MessagerieWsController(SimpMessagingTemplate messagingTemplate) {
+    public MessagerieWsController(SimpMessagingTemplate messagingTemplate, MessagerieService messagerieService) {
         this.messagingTemplate = messagingTemplate;
+        this.messagerieService = messagerieService;
     }
 
     @Data
@@ -34,6 +36,9 @@ public class MessagerieWsController {
 
     @Data
     public static class TypingEvent { private Long userId; private boolean typing; }
+
+    @Data
+    public static class StatutConversation { private Long userId; private Long conversationId; private boolean active; }
 
     @MessageMapping("/presence/register")
     public void registerPresence(PresenceRegister req, SimpMessageHeaderAccessor headers) {
@@ -72,6 +77,15 @@ public class MessagerieWsController {
         messagingTemplate.convertAndSend("/topic/conversations/" + conversationId + "/typing", req);
     }
 
+    @MessageMapping("/conversations/{conversationId}/active")
+    public void majStatutConversation(@DestinationVariable Long conversationId, StatutConversation req) {
+        if (conversationId == null || req == null || req.userId == null) return;
+        if (req.active) {
+            messagerieService.ajouterActif(conversationId, req.userId);
+        } else {
+            messagerieService.retirerActif(conversationId, req.userId);
+        }
+    }
 
     public Set<Long> getOnlineUsers() {
         return onlineCounts.keySet();

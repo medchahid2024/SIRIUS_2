@@ -20,6 +20,15 @@ public class Conversation {
     @Column(name = "idconversation")
     private Long idConversation;
 
+    @Column(name = "nom", length = 100)
+    private String nom;
+
+    @Column(name = "is_groupe", nullable = false)
+    private boolean isGroupe = false;
+
+    @Column(name = "creator_id")
+    private Long creatorId;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 

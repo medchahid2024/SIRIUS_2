@@ -21,10 +21,34 @@ pipeline {
       steps { checkout scm }
     }
 
+    stage('Tests Backend') {
+      steps {
+        dir("${BACKEND_DIR}") {
+          sh "mvn test"
+        }
+      }
+      post {
+        always {
+          junit "${BACKEND_DIR}/target/surefire-reports/*.xml"
+        }
+      }
+    }
+
     stage('Build Backend') {
       steps {
         dir("${BACKEND_DIR}") {
           sh "mvn clean package -DskipTests"
+        }
+      }
+    }
+
+    stage('Tests Frontend') {
+      steps {
+        dir("${FRONTEND_DIR}") {
+          sh """
+            npm install
+            CI=true npm test -- --watchAll=false
+          """
         }
       }
     }

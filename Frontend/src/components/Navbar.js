@@ -1,85 +1,112 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.jpeg";
 import "../styles/Navbar.css";
 import { getTotalUnread } from "../API/api";
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+import apiClient from "../API/apiClient";
 
 export default function Navbar() {
-  const [user, setUser] = useState(null);
-  const [unreadTotal, setUnreadTotal] = useState(0);
-  const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+    const [unreadTotal, setUnreadTotal] = useState(0);
+    const navigate = useNavigate();
+    const stompRef = useRef(null);
 
-  useEffect(() => {
-    const u = localStorage.getItem("user");
-    if (u) {
-      setUser(JSON.parse(u));
-    }
-  }, []);
+    const wsUrl = useMemo(() => {
+        const base = (apiClient.defaults.baseURL || "").replace(/\/$/, "");
+        return `${base}/ws`;
+    }, []);
 
-  useEffect(() => {
-    if (!user?.idUtilisateur && !user?.idutilisateur) return;
+    useEffect(() => {
+        const u = localStorage.getItem("user");
+        if (u) {
+            setUser(JSON.parse(u));
+        }
+    }, []);
 
-    const userId = user.idUtilisateur ?? user.idutilisateur;
+    useEffect(() => {
+        if (!user?.idUtilisateur && !user?.idutilisateur) return;
 
-    const tick = async () => {
-      try {
-        const n = await getTotalUnread(userId);
-        setUnreadTotal(Number(n) || 0);
-      } catch {
-        setUnreadTotal(0);
-      }
+        const userId = user.idUtilisateur ?? user.idutilisateur;
+
+        const fetchUnread = async () => {
+            try {
+                const n = await getTotalUnread(userId);
+                setUnreadTotal(Number(n) || 0);
+            } catch {
+                setUnreadTotal(0);
+            }
+        };
+
+        fetchUnread();
+        const pollId = setInterval(fetchUnread, 5000);
+
+        if (stompRef.current) return;
+
+        const client = new Client({
+            webSocketFactory: () => new SockJS(wsUrl),
+            reconnectDelay: 3000,
+            onConnect: () => {
+                client.subscribe(`/topic/unread/${userId}`, () => {
+                    fetchUnread();
+                });
+            },
+        });
+
+        client.activate();
+        stompRef.current = client;
+
+        return () => {
+            clearInterval(pollId);
+            client.deactivate();
+            stompRef.current = null;
+        };
+    }, [user, wsUrl]);
+
+    const goMessagerieInbox = () => {
+        navigate(`/Messagerie?inbox=1&t=${Date.now()}`);
     };
 
-    tick();
-    const id = setInterval(tick, 5000);
+    const logout = () => {
+        localStorage.removeItem("user");
+        navigate("/login");
+    };
 
-    return () => clearInterval(id);
-  }, [user]);
+    return (
+        <nav className="sirius-navbar">
+            <div className="sirius-navbar-inner">
+                <Link to="/Publication" className="sirius-logo-link">
+                    <img src={logo} alt="UPEC" className="sirius-logo" />
+                </Link>
 
-  const goMessagerieInbox = () => {
-    navigate(`/Messagerie?inbox=1&t=${Date.now()}`);
-  };
+                <div className="sirius-links">
+                    <button type="button" onClick={goMessagerieInbox} className="sirius-nav-button">
+                        Messagerie
+                        {unreadTotal > 0 && <span className="sirius-badge">{unreadTotal}</span>}
+                    </button>
 
-  const logout = () => {
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
+                    <NavLink to="/Publication" className="sirius-nav-link">
+                        Publications
+                    </NavLink>
 
-  return (
-    <nav className="sirius-navbar">
-      <div className="sirius-navbar-inner">
-        <Link to="/Publication" className="sirius-logo-link">
-          <img src={logo} alt="UPEC" className="sirius-logo" />
-        </Link>
+                    <NavLink to="/Home" className="sirius-nav-link">
+                        Notifications
+                    </NavLink>
 
+                    <NavLink to="/Home" className="sirius-nav-link">
+                        About
+                    </NavLink>
 
-        <div className="sirius-links">
-          <button type="button" onClick={goMessagerieInbox} className="sirius-nav-button">
-            Messagerie
-            {unreadTotal > 0 && <span className="sirius-badge">{unreadTotal}</span>}
-          </button>
+                    <NavLink to="/Profil" className="sirius-user-link">
+                        {user ? `${user.nom} ${user.prenom}` : "Profil"}
+                    </NavLink>
 
-          <NavLink to="/Publication" className="sirius-nav-link">
-            Publications
-          </NavLink>
-
-          <NavLink to="/Home" className="sirius-nav-link">
-            Notifications
-          </NavLink>
-
-          <NavLink to="/Home" className="sirius-nav-link">
-            About
-          </NavLink>
-
-          <NavLink to="/Profil" className="sirius-user-link">
-            {user ? `${user.nom} ${user.prenom}` : "Profil"}
-          </NavLink>
-
-          <button className="sirius-logout" onClick={logout}>
-            Déconnexion
-          </button>
-        </div>
-      </div>
-    </nav>
-  );
+                    <button className="sirius-logout" onClick={logout}>
+                        Déconnexion
+                    </button>
+                </div>
+            </div>
+        </nav>
+    );
 }

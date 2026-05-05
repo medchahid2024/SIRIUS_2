@@ -9,6 +9,12 @@ import {
     sendMessage,
     markConversationRead,
     getOnlineUsers,
+    getMesAmis,
+    createGroupe,
+    ajouterMembre,
+    supprimerMembre,
+    quitterGroupe,
+    sendFichier,
 } from "../API/api";
 
 import { Client } from "@stomp/stompjs";
@@ -33,6 +39,14 @@ export default function Messagerie() {
     const [error, setError] = useState("");
 
 
+    const [showGroupModal, setShowGroupModal] = useState(false);
+    const [groupName, setGroupName] = useState('');
+    const [friendsList, setFriendsList] = useState([]);
+    const [selectedFriends, setSelectedFriends] = useState([]);
+
+    const [showMembresPanel, setShowMembresPanel] = useState(false);
+    const [amisDisponibles, setAmisDisponibles] = useState([]);
+
     const [onlineSet, setOnlineSet] = useState(new Set());
     const [otherTyping, setOtherTyping] = useState(false);
     const typingTimerRef = useRef(null);
@@ -44,6 +58,7 @@ export default function Messagerie() {
 
     const knownMessageIdsRef = useRef(new Set());
     const endRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     const wsUrl = useMemo(() => {
         const base = (apiClient.defaults.baseURL || "").replace(/\/$/, "");
@@ -70,6 +85,7 @@ export default function Messagerie() {
             setActiveConv(convId);
             setActiveOther(other || null);
             setOtherTyping(false);
+            setShowMembresPanel(false);
 
             try {
                 await loadMessages(convId, user.idUtilisateur);
@@ -188,9 +204,8 @@ export default function Messagerie() {
             webSocketFactory: () => new SockJS(wsUrl),
             reconnectDelay: 3000,
             onConnect: () => {
-                // presence subscribe
                 client.subscribe("/topic/presence", (frame) => {
-                    const evt = JSON.parse(frame.body); // {userId, online}
+                    const evt = JSON.parse(frame.body);
                     setOnlineSet((prev) => {
                         const next = new Set(prev);
                         if (evt.online) next.add(evt.userId);
@@ -227,6 +242,11 @@ export default function Messagerie() {
         subMsgRef.current = null;
         subTypingRef.current = null;
 
+        client.publish({
+            destination: `/app/conversations/${activeConv}/active`,
+            body: JSON.stringify({ userId: user.idUtilisateur, conversationId: activeConv, active: true }),
+        });
+
         subMsgRef.current = client.subscribe(
             `/topic/conversations/${activeConv}`,
             (frame) => {
@@ -237,7 +257,6 @@ export default function Messagerie() {
                 knownMessageIdsRef.current.add(msg.idMessage);
                 setMessages((prev) => [...prev, msg]);
 
-                // mark as read if active convo
                 markConversationRead(activeConv, user.idUtilisateur).catch(() => {});
                 refreshInbox(user.idUtilisateur).catch(() => {});
             }
@@ -246,7 +265,7 @@ export default function Messagerie() {
         subTypingRef.current = client.subscribe(
             `/topic/conversations/${activeConv}/typing`,
             (frame) => {
-                const evt = JSON.parse(frame.body); // {userId, typing}
+                const evt = JSON.parse(frame.body);
                 if (evt.userId === user.idUtilisateur) return;
                 setOtherTyping(!!evt.typing);
             }
@@ -257,6 +276,12 @@ export default function Messagerie() {
             subTypingRef.current?.unsubscribe();
             subMsgRef.current = null;
             subTypingRef.current = null;
+            if (client?.connected) {
+                client.publish({
+                    destination: `/app/conversations/${activeConv}/active`,
+                    body: JSON.stringify({ userId: user.idUtilisateur, conversationId: activeConv, active: false }),
+                });
+            }
         };
     }, [activeConv, user?.idUtilisateur, refreshInbox]);
 
@@ -308,6 +333,101 @@ export default function Messagerie() {
         }
     };
 
+    const openGroupModal = async () => {
+        if (!user?.idUtilisateur) return;
+        try {
+            const amis = await getMesAmis(user.idUtilisateur);
+            setFriendsList(Array.isArray(amis) ? amis : []);
+        } catch {
+            setFriendsList([]);
+        }
+        setSelectedFriends([]);
+        setGroupName('');
+        setShowGroupModal(true);
+    };
+
+    const toggleFriend = (id) => {
+        setSelectedFriends(prev =>
+            prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
+        );
+    };
+
+    const openMembresPanel = async () => {
+        if (!user?.idUtilisateur || !activeConv) return;
+        const conv = conversations.find(c => c.idConversation === activeConv);
+        const membresIds = new Set((conv?.membres || []).map(m => m.idUtilisateur));
+        try {
+            const amis = await getMesAmis(user.idUtilisateur);
+            setAmisDisponibles((amis || []).filter(a => !membresIds.has(a.idUtilisateur)));
+        } catch {
+            setAmisDisponibles([]);
+        }
+        setShowMembresPanel(true);
+    };
+
+    const handleAjouterMembre = async (amiId) => {
+        try {
+            await ajouterMembre(activeConv, user.idUtilisateur, amiId);
+            await refreshInbox(user.idUtilisateur);
+            await openMembresPanel();
+        } catch {
+            setError("Impossible d'ajouter ce membre.");
+        }
+    };
+
+    const handleSupprimerMembre = async (membreId) => {
+        try {
+            await supprimerMembre(activeConv, user.idUtilisateur, membreId);
+            await refreshInbox(user.idUtilisateur);
+            await openMembresPanel();
+        } catch {
+            setError("Impossible de supprimer ce membre.");
+        }
+    };
+
+    const handleQuitterGroupe = async () => {
+        if (!activeConv || !user?.idUtilisateur) return;
+        try {
+            await quitterGroupe(activeConv, user.idUtilisateur);
+            setActiveConv(null);
+            setActiveOther(null);
+            setMessages([]);
+            setShowMembresPanel(false);
+            await refreshInbox(user.idUtilisateur);
+        } catch {
+            setError("Impossible de quitter le groupe.");
+        }
+    };
+
+    const handleSendFile = async (e) => {
+        const fichier = e.target.files[0];
+        if (!fichier || !activeConv || !user?.idUtilisateur) return;
+        e.target.value = "";
+        try {
+            const msg = await sendFichier(activeConv, user.idUtilisateur, fichier);
+            if (msg?.idMessage && !knownMessageIdsRef.current.has(msg.idMessage)) {
+                knownMessageIdsRef.current.add(msg.idMessage);
+                setMessages((prev) => [...prev, msg]);
+            }
+            markConversationRead(activeConv, user.idUtilisateur).catch(() => {});
+            await refreshInbox(user.idUtilisateur);
+        } catch {
+            setError("Impossible d'envoyer le fichier.");
+        }
+    };
+
+    const handleCreateGroup = async () => {
+        if (!groupName.trim() || selectedFriends.length < 2) return;
+        try {
+            const conv = await createGroupe(groupName, user.idUtilisateur, selectedFriends);
+            await refreshInbox(user.idUtilisateur);
+            setShowGroupModal(false);
+            await openConversation(conv.idConversation, null);
+        } catch {
+            setError('Impossible de créer le groupe.');
+        }
+    };
+
     const manualRefresh = async () => {
         if (!user?.idUtilisateur) return;
         try {
@@ -321,10 +441,20 @@ export default function Messagerie() {
         }
     };
 
+    const displayed = searchTerm.trim()
+        ? conversations.filter(conv => {
+            const term = searchTerm.toLowerCase().trim();
+            if (conv.isGroupe) return conv.nom?.toLowerCase().includes(term);
+            return (
+                conv.other?.nom?.toLowerCase().includes(term) ||
+                conv.other?.prenom?.toLowerCase().includes(term)
+            );
+        })
+        : conversations;
+
     return (
         <div className="container-fluid messagerie-page" style={{ paddingTop: 12 }}>
             <div className="row h-100 messagerie-row">
-                {/* LEFT: inbox */}
                 <div className="col-12 col-md-4 col-lg-3 messagerie-left">
                     <div className="d-flex justify-content-between align-items-center p-2">
                         <h5 className="m-0">Messagerie</h5>
@@ -350,26 +480,78 @@ export default function Messagerie() {
                         </div>
                     </div>
 
+                    {showGroupModal && (
+                        <div className="modal d-block" style={{ background: 'rgba(0,0,0,0.4)', position: 'fixed', inset: 0, zIndex: 1050 }}>
+                            <div className="modal-dialog">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h5 className="modal-title">Créer un groupe</h5>
+                                        <button type="button" className="btn-close" onClick={() => setShowGroupModal(false)} />
+                                    </div>
+                                    <div className="modal-body">
+                                        <input
+                                            className="form-control mb-3"
+                                            placeholder="Nom du groupe"
+                                            value={groupName}
+                                            onChange={e => setGroupName(e.target.value)}
+                                        />
+                                        {friendsList.length === 0
+                                            ? <div className="text-muted">Aucun ami trouvé</div>
+                                            : friendsList.map(ami => (
+                                                <div key={ami.idUtilisateur} className="form-check mb-1">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        id={`ami-${ami.idUtilisateur}`}
+                                                        checked={selectedFriends.includes(ami.idUtilisateur)}
+                                                        onChange={() => toggleFriend(ami.idUtilisateur)}
+                                                    />
+                                                    <label className="form-check-label" htmlFor={`ami-${ami.idUtilisateur}`}>
+                                                        {ami.nom} {ami.prenom}
+                                                    </label>
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button className="btn btn-secondary" onClick={() => setShowGroupModal(false)}>Annuler</button>
+                                        <button
+                                            className="btn btn-danger"
+                                            onClick={handleCreateGroup}
+                                            disabled={!groupName.trim() || selectedFriends.length < 2}
+                                        >
+                                            Créer
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
 
                     <div className="list-group list-group-flush">
-                        {conversations.length === 0 ? (
+                        {displayed.length === 0 ? (
                             <div className="p-3 text-muted">Pas encore de conversations</div>
                         ) : (
-                            conversations.map((conv) => {
+                            displayed.map((conv) => {
                                 const autreUser = conv.other;
-                                const online = autreUser?.idUtilisateur && onlineSet.has(autreUser.idUtilisateur);
+                                const online = !conv.isGroupe && autreUser?.idUtilisateur && onlineSet.has(autreUser.idUtilisateur);
                                 const nonLus = Number(conv.unreadCount || 0);
+                                const titre = conv.isGroupe
+                                    ? conv.nom
+                                    : `${autreUser?.nom ?? ''} ${autreUser?.prenom ?? ''}`;
+                                const prefixe = conv.lastSenderId === user?.idUtilisateur
+                                    ? 'Vous : '
+                                    : conv.lastSenderPrenom ? `${conv.lastSenderPrenom} : ` : '';
 
                                 return (
                                     <button
                                         key={conv.idConversation}
                                         className={`list-group-item list-group-item-action ${activeConv === conv.idConversation ? 'active' : ''}`}
-                                        onClick={() => openConversation(conv.idConversation, conv.other)}
+                                        onClick={() => openConversation(conv.idConversation, conv.isGroupe ? null : conv.other)}
                                     >
                                         <div className="d-flex align-items-center">
-                                            <div className="fw-bold me-auto">
-                                                {autreUser?.nom} {autreUser?.prenom}
-                                            </div>
+                                            <div className="fw-bold me-auto">{titre}</div>
 
                                             {online && (
                                                 <span
@@ -380,14 +562,12 @@ export default function Messagerie() {
                                             )}
 
                                             {nonLus > 0 && (
-                                                <span className="badge bg-danger">
-                                {nonLus}
-                            </span>
+                                                <span className="badge bg-danger">{nonLus}</span>
                                             )}
                                         </div>
 
                                         <div className="small text-muted mt-1">
-                                            {conv.lastMessage || 'Aucun message'}
+                                            {conv.lastMessage ? prefixe + conv.lastMessage : 'Aucun message'}
                                         </div>
                                     </button>
                                 );
@@ -395,9 +575,18 @@ export default function Messagerie() {
                         )}
                     </div>
 
+                    <div className="p-2 border-top">
+                        <button
+                            type="button"
+                            className="btn btn-danger w-100"
+                            onClick={openGroupModal}
+                        >
+                            Créer un groupe
+                        </button>
+                    </div>
+
                 </div>
 
-                {/* RIGHT: thread */}
                 <div className="col-12 col-md-8 col-lg-9 messagerie-right">
                     {!activeConv ? (
                         <div className="h-100 d-flex align-items-center justify-content-center text-muted">
@@ -406,19 +595,75 @@ export default function Messagerie() {
                         </div>
                     ) : (
                         <>
-                            {}
                             <div className="p-2 border-bottom bg-white">
-                                <div className="fw-semibold">
-                                    {activeOther
-                                        ? `${activeOther.nom} ${activeOther.prenom}`
-                                        : "Conversation"}
-                                </div>
+                                {(() => {
+                                    const conv = conversations.find(c => c.idConversation === activeConv);
+                                    const estCreateur = conv?.creatorId === user?.idUtilisateur;
+                                    return conv?.isGroupe ? (
+                                        <>
+                                            <div className="d-flex align-items-center justify-content-between">
+                                                <div className="fw-semibold">{conv.nom}</div>
+                                                <div className="d-flex gap-2">
+                                                    {estCreateur && (
+                                                        <button
+                                                            className="btn btn-sm btn-outline-secondary"
+                                                            onClick={() => showMembresPanel ? setShowMembresPanel(false) : openMembresPanel()}
+                                                        >
+                                                            Gérer
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        className="btn btn-sm btn-outline-danger"
+                                                        onClick={handleQuitterGroupe}
+                                                    >
+                                                        Quitter
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            {estCreateur && showMembresPanel && (
+                                                <div className="mt-2 p-2 border rounded bg-light">
+                                                    <div className="fw-semibold mb-1 small">Membres actuels</div>
+                                                    {(conv.membres || []).filter(m => m.idUtilisateur !== user.idUtilisateur).map(m => (
+                                                        <div key={m.idUtilisateur} className="d-flex align-items-center justify-content-between mb-1">
+                                                            <span className="small">{m.prenom} {m.nom}</span>
+                                                            <button
+                                                                className="btn btn-sm btn-outline-danger py-0"
+                                                                onClick={() => handleSupprimerMembre(m.idUtilisateur)}
+                                                            >
+                                                                Retirer
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                    {amisDisponibles.length > 0 && (
+                                                        <>
+                                                            <div className="fw-semibold mb-1 small mt-2">Ajouter un ami</div>
+                                                            {amisDisponibles.map(a => (
+                                                                <div key={a.idUtilisateur} className="d-flex align-items-center justify-content-between mb-1">
+                                                                    <span className="small">{a.nom} {a.prenom}</span>
+                                                                    <button
+                                                                        className="btn btn-sm btn-outline-success py-0"
+                                                                        onClick={() => handleAjouterMembre(a.idUtilisateur)}
+                                                                    >
+                                                                        Ajouter
+                                                                    </button>
+                                                                </div>
+                                                            ))}
+                                                        </>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div className="fw-semibold">
+                                            {activeOther ? `${activeOther.nom} ${activeOther.prenom}` : "Conversation"}
+                                        </div>
+                                    );
+                                })()}
                                 {otherTyping && (
                                     <div className="small text-muted">En train d’écrire…</div>
                                 )}
                             </div>
 
-                            {/* messages */}
                             <div className="messagerie-thread">
                                 {error && <div className="text-danger mb-2">{error}</div>}
 
@@ -448,7 +693,24 @@ export default function Messagerie() {
                                                             {m.senderNom} {m.senderPrenom}
                                                         </div>
                                                     )}
-                                                    {m.contenu}
+                                                    {m.fichierUrl ? (
+                                                        (m.fichierNom?.endsWith('.png') || m.fichierNom?.endsWith('.jpg') || m.fichierNom?.endsWith('.jpeg')) ? (
+                                                            <img
+                                                                src={`${apiClient.defaults.baseURL}${m.fichierUrl}`}
+                                                                alt={m.fichierNom}
+                                                                style={{ maxWidth: 200, borderRadius: 8, display: "block" }}
+                                                            />
+                                                        ) : (
+                                                            <a
+                                                                href={`${apiClient.defaults.baseURL}${m.fichierUrl}`}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                style={{ color: mine ? "#fff" : "#dc3545" }}
+                                                            >
+                                                                {m.fichierNom}
+                                                            </a>
+                                                        )
+                                                    ) : m.contenu}
                                                 </div>
                                             </div>
                                         );
@@ -458,7 +720,6 @@ export default function Messagerie() {
                                 <div ref={endRef}/>
                             </div>
 
-                            {/* composer */}
                             <div className="messagerie-composer">
                                 <div className="d-flex gap-2">
                                     <input
@@ -468,6 +729,20 @@ export default function Messagerie() {
                                         onChange={(e) => onChangeText(e.target.value)}
                                         onKeyDown={(e) => e.key === "Enter" && onSend()}
                                     />
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        style={{ display: "none" }}
+                                        accept=".png,.jpg,.jpeg,.pdf,.docx,.pptx"
+                                        onChange={handleSendFile}
+                                    />
+                                    <button
+                                        className="btn btn-outline-secondary"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        title="Joindre un fichier"
+                                    >
+                                        Joindre
+                                    </button>
                                     <button className="btn btn-danger" onClick={onSend}>
                                         Envoyer
                                     </button>
